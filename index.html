@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Textprint</title>
+<meta name="description" content="Free, private AI text checker. Sentence-by-sentence AI-style scoring with reasons, plus a scan for hidden characters and invisible messages. Up to 5,000,000 characters, all in your browser.">
+<meta name="theme-color" content="#0a0a0c">
+<meta property="og:title" content="Textprint">
+<meta property="og:description" content="Know what wrote it. Free, private AI text checker that shows its reasons.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230a0a0c'/%3E%3Cg fill='none' stroke='%23e5e5ea' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M12 3.5a8.5 8.5 0 0 0-8.5 8.5'/%3E%3Cpath d='M12 3.5a8.5 8.5 0 0 1 8.5 8.5v1.5'/%3E%3Cpath d='M12 7a5 5 0 0 0-5 5v2.5'/%3E%3Cpath d='M12 7a5 5 0 0 1 5 5v4'/%3E%3Cpath d='M12 10.5a1.5 1.5 0 0 0-1.5 1.5v5.5'/%3E%3Cpath d='M13.5 12v8'/%3E%3C/g%3E%3C/svg%3E">
+<style>html{color-scheme:dark}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body><style>
+/* Layout: one dark graphite stage, quiet silver type, generous air. Document left, readings right. Deliberately dark-only. */
+:root{
+  color-scheme:dark;
+  --bg:#0a0a0c; --panel:#151517; --raise:#1d1d20; --ink:#f5f5f7; --muted:#8e8e93; --faint:#5c5c61;
+  --line:rgba(255,255,255,.08); --silver-hi:#f5f5f7; --silver-lo:#a1a1a6; --accent:#d1d1d6;
+  --ai:#ff6961; --ai-bg:rgba(255,105,97,.15); --mix:#ffd426; --mix-bg:rgba(255,212,38,.12);
+  --hid:#da8fff; --hid-bg:rgba(191,90,242,.18); --ok:#32d74b;
+  --display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --body:ui-serif,"New York","Iowan Old Style",Georgia,serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--display);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(1100px 520px at 50% -180px,rgba(255,255,255,.07),transparent 70%)}
+.wrap{position:relative;max-width:1240px;margin:0 auto;padding-inline:32px;padding-block:88px 56px}
+html{scroll-padding-top:64px;scroll-behavior:smooth}
+@media (max-width:620px){.wrap{padding-inline:16px;padding-block:40px 64px}}
+
+header.top{display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;margin-bottom:56px}
+.brand{font-weight:700;font-size:clamp(44px,7vw,76px);letter-spacing:-.045em;line-height:1;margin:0;
+  background:linear-gradient(180deg,var(--silver-hi) 20%,var(--silver-lo) 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand small{display:block;font-weight:400;font-size:clamp(16px,2vw,20px);letter-spacing:-.01em;line-height:1.4;color:var(--muted);margin:16px auto 0;max-width:34ch;-webkit-text-fill-color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 22px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.sw{width:18px;height:10px;border-radius:3px;display:inline-block}
+.sw.ai{background:var(--ai-bg);box-shadow:inset 0 -2px var(--ai)}
+.sw.mix{background:var(--mix-bg);box-shadow:inset 0 -2px var(--mix)}
+.sw.hu{background:transparent;border:1px solid var(--faint)}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:28px;align-items:start}
+@media (max-width:980px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:28px;min-width:0}
+aside.col{position:sticky;top:calc(env(safe-area-inset-top,0px) + 72px);max-height:calc(100vh - 96px);overflow:auto;scrollbar-width:thin}
+@media (max-width:980px){aside.col{position:static;max-height:none;overflow:visible}}
+
+.panel{background:linear-gradient(180deg,var(--raise),var(--panel) 120px);border:1px solid var(--line);border-radius:22px;padding:28px;min-width:0;box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 20px 40px -24px rgba(0,0,0,.8)}
+@media (max-width:620px){.panel{padding:20px;border-radius:18px}}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:-.005em;color:var(--muted);margin:0 0 16px}
+
+textarea{width:100%;min-height:190px;resize:vertical;font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--ink);background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+textarea::placeholder{color:var(--faint)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:18px}
+.spacer{flex:1 1 auto}
+.count{font-family:var(--mono);font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+button,.filebtn{font:inherit;font-size:14px;font-weight:500;letter-spacing:-.01em;border:0;background:rgba(255,255,255,.08);color:var(--ink);border-radius:980px;padding:9px 18px;cursor:pointer;transition:background .2s,transform .1s}
+button:hover,.filebtn:hover{background:rgba(255,255,255,.14)}
+button:active{transform:scale(.98)}
+button.primary{background:linear-gradient(180deg,#f5f5f7,#c7c7cc);color:#0a0a0c;font-weight:600;padding:9px 22px}
+button.primary:hover{background:linear-gradient(180deg,#ffffff,#d1d1d6)}
+button:disabled{opacity:.4;cursor:default;transform:none}
+button:focus-visible,.filebtn:focus-within,textarea:focus-visible,canvas:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+textarea:focus-visible{outline-offset:0;border-color:transparent}
+.filebtn input{position:absolute;width:1px;height:1px;opacity:0}
+.filebtn{position:relative;display:inline-flex}
+.status{font-size:13px;color:var(--muted);min-height:1.3em;margin:16px 0 0}
+.status.err{color:var(--ai)}
+
+.mapwrap{margin-bottom:20px}
+canvas#map{display:block;width:100%;height:22px;border-radius:8px;cursor:pointer;background:rgba(0,0,0,.35);border:1px solid var(--line)}
+.maplab{display:flex;justify-content:space-between;font-size:11px;color:var(--faint);margin-top:8px;font-family:var(--mono)}
+
+.pager{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:20px}
+.pinfo{font-family:var(--mono);font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.doc{font-family:var(--body);font-size:18px;line-height:1.85;color:#e8e8ed;white-space:pre-wrap;overflow-wrap:anywhere;max-height:72vh;overflow:auto;padding:8px 10px 8px 4px;scrollbar-width:thin}
+.doc .s{cursor:pointer;border-radius:4px;transition:background .15s;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.doc .s:hover{background:rgba(255,255,255,.06)}
+.doc .s.ai{background:var(--ai-bg);box-shadow:inset 0 -1.5px var(--ai)}
+.doc .s.mix{background:var(--mix-bg);box-shadow:inset 0 -1.5px rgba(255,212,38,.5)}
+.doc .s.sel{outline:1.5px solid var(--accent);outline-offset:2px}
+.hid{font-family:var(--mono);font-size:10px;font-weight:600;line-height:1;padding:2px 5px;margin:0 2px;border-radius:5px;background:var(--hid-bg);color:var(--hid);vertical-align:2px;white-space:nowrap}
+.hid.soft{background:transparent;border:1px dotted var(--hid);opacity:.7}
+
+.score{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.big{font-weight:700;font-size:84px;letter-spacing:-.05em;line-height:.85;font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,var(--silver-hi) 25%,var(--silver-lo));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big span{font-size:36px;letter-spacing:-.02em;margin-left:2px}
+.scorelab{font-size:14px;color:var(--muted);max-width:16ch;padding-bottom:6px}
+.verdict{font-weight:600;font-size:19px;letter-spacing:-.02em;margin:22px 0 14px}
+.bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,.08)}
+.bar i{display:block;height:100%}
+.bar .b-ai{background:var(--ai)}
+.bar .b-mix{background:var(--mix)}
+dl.kv{display:grid;grid-template-columns:1fr auto;gap:0;margin:24px 0 0;font-size:14px}
+dl.kv dt,dl.kv dd{padding:10px 0;border-top:1px solid var(--line)}
+dl.kv dt{color:var(--muted)}
+dl.kv dd{margin:0;font-family:var(--mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+
+ol.top{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;font-size:14px}
+ol.top li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line)}
+ol.top b{font-family:var(--mono);font-weight:500;font-size:12px;color:var(--muted)}
+
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:5px 11px;border-radius:980px}
+.chip.ai{background:var(--ai-bg);color:var(--ai)}
+.chip.mix{background:var(--mix-bg);color:var(--mix)}
+.chip.hu{background:rgba(255,255,255,.07);color:var(--muted)}
+.dhead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+blockquote{margin:0 0 18px;padding:14px 16px;border-radius:12px;background:rgba(0,0,0,.3);font-family:var(--body);font-size:15.5px;line-height:1.6;color:#e8e8ed;overflow-wrap:anywhere;white-space:pre-wrap;max-height:10em;overflow:auto}
+ul.why{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font-size:14px}
+ul.why li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:baseline}
+.w{font-family:var(--mono);font-size:12px;font-weight:600;text-align:right}
+.w.pos{color:var(--ai)} .w.neg{color:var(--ok)}
+.note{font-size:13px;line-height:1.55;color:var(--muted);margin:16px 0 0}
+
+table.hm{width:100%;border-collapse:collapse;font-size:13.5px}
+table.hm td{border-top:1px solid var(--line);padding:14px 4px;vertical-align:top}
+table.hm tr:first-child td{border-top:0;padding-top:0}
+table.hm td.n{font-family:var(--mono);font-size:13px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;padding-left:14px}
+table.hm .nm{font-weight:600}
+table.hm .ds{color:var(--muted);display:block;margin-top:4px;font-size:12.5px;line-height:1.5}
+table.hm tr.zero{opacity:.38}
+.linkbtn{border:0;background:none;padding:0;color:var(--accent);font-size:12.5px;font-weight:500;cursor:pointer;text-decoration:none;border-radius:0}
+.linkbtn:hover{background:none;text-decoration:underline}
+.decoded{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+.decoded div{font-family:var(--mono);font-size:12.5px;background:var(--hid-bg);color:var(--ink);border-radius:12px;padding:12px 14px;overflow-wrap:anywhere}
+.decoded div b{color:var(--hid);display:block;font-size:11px;font-weight:600;margin-bottom:6px}
+
+details.how{font-size:15px;line-height:1.65}
+details.how summary{cursor:pointer;font-weight:600;letter-spacing:-.01em;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.how summary::-webkit-details-marker{display:none}
+details.how summary::after{content:"+";font-weight:300;font-size:24px;line-height:1;color:var(--muted)}
+details.how[open] summary::after{content:"−"}
+details.how[open] summary{margin-bottom:12px}
+details.how p,details.how li{max-width:68ch;color:#d2d2d7}
+details.how ul{padding-left:20px;display:flex;flex-direction:column;gap:6px}
+details.how b{color:var(--ink);font-weight:600}
+.honest{font-size:12.5px;color:var(--faint);margin:20px 0 0;max-width:70ch}
+@media (prefers-reduced-motion:no-preference){.doc .s.flash{animation:fl 1.2s ease-out}@keyframes fl{0%{outline:3px solid var(--accent)}100%{outline:3px solid transparent}}}
+/* global nav: translucent, blurred, hairline below */
+.gnav{position:sticky;top:0;z-index:20;padding-top:env(safe-area-inset-top,0px);background:rgba(22,22,23,.72);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(255,255,255,.06)}
+.gnav-in{max-width:1240px;margin:0 auto;padding-inline:32px;height:48px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+@media (max-width:620px){.gnav-in{padding-inline:16px}}
+.gbrand{display:inline-flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none;font-size:17px;font-weight:600;letter-spacing:-.02em}
+.glinks{display:flex;gap:26px;font-size:12px;letter-spacing:-.01em}
+.glinks a{color:#d2d2d7;text-decoration:none;transition:color .2s}
+.glinks a:hover{color:#fff}
+@media (max-width:620px){.glinks{gap:16px}.glinks a:nth-child(n+3){display:none}}
+.kicker{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em;background:linear-gradient(90deg,#ff8a65,#ff375f 45%,#bf5af2);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{margin:0 auto;max-width:38ch;font-size:clamp(17px,2.1vw,21px);line-height:1.45;letter-spacing:-.015em;color:var(--muted)}
+.ptitle{font-size:clamp(22px,2.6vw,28px);font-weight:600;letter-spacing:-.03em;line-height:1.15;margin:0 0 22px;color:var(--ink)}
+/* score ring, like an activity ring */
+.ringwrap{position:relative;width:176px;height:176px;margin:4px auto 6px}
+.ring{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:14;stroke-linecap:round}
+.rtrack{stroke:rgba(255,55,95,.14)}
+.rmix{stroke:var(--mix);opacity:.85}
+@media (prefers-reduced-motion:no-preference){.rai,.rmix{animation:ringin .9s cubic-bezier(.2,.8,.2,1) both}@keyframes ringin{from{stroke-dasharray:0 400}}}
+.ringnum{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ringnum .big{font-size:52px}
+.ringnum .big span{font-size:24px}
+.ringlab{font-size:12px;font-weight:600;color:var(--muted);margin-top:4px}
+#summary .verdict{text-align:center;margin:14px 0 6px}
+footer.fine{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+footer.fine p{margin:0;font-size:12px;line-height:1.5;color:var(--faint);max-width:none}
+.progress{margin-top:20px}
+.ptrack{position:relative;height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.ptrack i{position:absolute;inset:0;transform-origin:left center;transform:scaleX(0);border-radius:3px;
+  background:linear-gradient(90deg,#8e8e93,#f5f5f7 60%,#c7c7cc);transition:transform .25s ease-out}
+.ptrack i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);transform:translateX(-100%);animation:shine 1.1s linear infinite}
+.progress.done .ptrack i::after{animation:none;opacity:0}
+.pmeta{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:13px;color:var(--muted)}
+.pmeta #progpct{font-family:var(--mono);font-size:12px;color:var(--ink);font-variant-numeric:tabular-nums}
+@keyframes shine{to{transform:translateX(100%)}}
+body.busy .doc,body.busy #summary{opacity:.35;transition:opacity .2s}
+.sub{font-size:12px;font-weight:600;color:var(--faint);margin:18px 0 10px}
+@media (prefers-reduced-motion:reduce){button{transition:none}.ptrack i{transition:none}.ptrack i::after{animation:none}}
+</style>
+
+<nav class="gnav" aria-label="Sections">
+  <div class="gnav-in">
+    <a class="gbrand" href="#check"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 3.5a8.5 8.5 0 0 0-8.5 8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 8.5 8.5v1.5"/><path d="M12 7a5 5 0 0 0-5 5v2.5"/><path d="M12 7a5 5 0 0 1 5 5v4"/><path d="M12 10.5a1.5 1.5 0 0 0-1.5 1.5v5.5"/><path d="M13.5 12v8"/></g></svg>Textprint</a>
+    <div class="glinks"><a href="#check">Check</a><a href="#document">Document</a><a href="#marks">Hidden marks</a><a href="#how">How it works</a></div>
+  </div>
+</nav>
+<div class="wrap">
+  <header class="top">
+    <p class="kicker">Free. Private. Up to 5,000,000 characters.</p>
+    <h1 class="brand">Know what wrote it.</h1>
+    <p class="lede">Textprint reads your text the way a detective reads a fingerprint: passage by passage, with every clue shown. It runs entirely in your browser, so nothing is uploaded.</p>
+    <div class="legend" aria-label="Legend">
+      <span><i class="sw ai"></i>AI-style</span>
+      <span><i class="sw mix"></i>Mixed</span>
+      <span><i class="sw hu"></i>Human-style</span>
+      <span><span class="hid">ZWSP</span>Hidden character</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <main class="col">
+      <section class="panel" aria-labelledby="in-h" id="check">
+        <h2 class="ptitle" id="in-h">Paste. Analyze. See why.</h2>
+        <textarea id="input" maxlength="5000000" spellcheck="false" aria-label="Text to analyze"></textarea>
+        <div class="row">
+          <button class="primary" id="run">Analyze</button>
+          <label class="filebtn">Upload .txt / .md<input type="file" id="file" accept=".txt,.md,.csv,.html,.htm,.json,.srt,.log,text/*"></label>
+          <button id="sample">Load sample</button>
+          <button id="clear">Clear</button>
+          <span class="spacer"></span>
+          <span class="count" id="count">0 / 5,000,000 characters</span>
+        </div>
+        <div class="progress" id="prog" role="progressbar" aria-label="Analysis progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden>
+          <div class="ptrack"><i id="progfill"></i></div>
+          <div class="pmeta"><span id="proglab">Reading the text…</span><span id="progpct">0%</span></div>
+        </div>
+        <p class="status" id="status" role="status"></p>
+      </section>
+
+      <section class="panel" aria-labelledby="doc-h" id="document">
+        <h2 class="ptitle" id="doc-h">Every sentence, marked.</h2>
+        <div class="mapwrap">
+          <canvas id="map" tabindex="0" aria-label="Overview of the whole text. Red marks are AI-style passages. Click to jump."></canvas>
+          <div class="maplab"><span>start</span><span id="maplen"></span><span>end</span></div>
+        </div>
+        <div class="pager">
+          <button id="prev" aria-label="Previous page">◂ Prev</button>
+          <button id="next" aria-label="Next page">Next ▸</button>
+          <button id="nextai">Next AI-style passage</button>
+          <span class="spacer"></span>
+          <span class="pinfo" id="pinfo"></span>
+        </div>
+        <div class="doc" id="doc" aria-live="off"></div>
+      </section>
+
+      <section class="panel">
+        <details class="how" id="how">
+          <summary>How this works, and what it can't do</summary>
+          <p>The text is split into passages of about 100 words. Each passage is measured as a whole, the way detectors like ZeroGPT work, because clean AI writing rarely gives itself away in a single sentence. Each sentence then gets its passage's score, adjusted by anything specific to that sentence.</p>
+          <ul>
+            <li><b>Style statistics:</b> how evenly sentence lengths run, average word length, how many abstract nouns (-tion, -ment, -ity), trailing "-ing" clauses (", ensuring…"), and how polished the punctuation is.</li>
+            <li><b>Specifics:</b> human writing tends to carry names, places, numbers, a personal "I", asides in parentheses and exclamation marks. Generic text without them leans AI.</li>
+            <li><b>Wording:</b> words and stock phrases that language models overuse ("enhance", "crucial", "delve", "a testament to", "it's important to note").</li>
+            <li><b>Templates:</b> "not just X, but Y", "Whether you're a… or a…", essay-style wrap-ups, formal transitions at the start of sentences.</li>
+            <li><b>Formatting:</b> markdown bold and headings, bullets with bold lead-ins, emoji bullets, frequent em dashes.</li>
+            <li><b>Human signals lower the score:</b> slang, typos, lowercase "i", repeated punctuation, uneven rhythm.</li>
+            <li><b>Hidden characters:</b> zero-width characters, unusual spaces, direction controls, Unicode tag characters and variation-selector runs (which can carry a hidden message, decoded here), and look-alike letters from other alphabets.</li>
+          </ul>
+          <p><b>No detector is 100% accurate, this one included.</b> Formal human writing (legal, academic, corporate) can score high. AI text that someone edited or rewrote can score low. Claude and GPT don't put a detectable watermark in their text, so no tool can prove who wrote something. Hidden characters prove the text passed through some tool or editor, not that an AI wrote it. Use the score as a reason to look closer, never as proof against a person.</p>
+          <p>It doesn't name the model (Claude, GPT, Gemini). Their styles overlap too much to tell apart reliably.</p>
+        </details>
+      </section>
+    </main>
+
+    <aside class="col">
+      <section class="panel" aria-labelledby="sum-h">
+        <p class="eyebrow" id="sum-h">Reading</p>
+        <div id="summary"><p class="note">Run an analysis to see the score.</p></div>
+        <p class="honest">These are AI-style signals, not proof. See "How this works" below the document.</p>
+      </section>
+      <section class="panel" aria-labelledby="det-h">
+        <p class="eyebrow" id="det-h">Why this sentence</p>
+        <div id="detail"><p class="note">Click any sentence in the document to see what raised or lowered its score.</p></div>
+      </section>
+      <section class="panel" aria-labelledby="top-h">
+        <p class="eyebrow" id="top-h">Most frequent signals</p>
+        <div id="top"><p class="note">Nothing yet.</p></div>
+      </section>
+      <section class="panel" aria-labelledby="hid-h" id="marks">
+        <p class="eyebrow" id="hid-h">Hidden marks</p>
+        <div id="hidden"><p class="note">Nothing yet.</p></div>
+        <div class="row">
+          <button id="copyclean">Copy cleaned text</button>
+          <button id="useclean">Clean and re-check</button>
+        </div>
+      </section>
+    </aside>
+  </div>
+  <footer class="fine">
+    <p>Textprint estimates how AI-like a text reads from its style and wording. No detector, including this one, is 100% accurate: formal human writing can score high and edited AI text can score low. Claude and GPT do not embed a detectable watermark, so a score is never proof of who wrote something. Please don't use it as the only basis for decisions about a person.</p>
+    <p>Your text never leaves this browser tab. Hidden-character results show that text passed through some tool or editor, not that an AI wrote it.</p>
+  </footer>
+</div>
+
+<script type="text/plain" id="worker-src">
+"use strict";
+// ---------- sentence-level rules: stock phrases, formatting, human tells ----------
+const REASONS = [], RID = {};
+function rid(n){ if (RID[n] === undefined){ RID[n] = REASONS.length; REASONS.push(n); } return RID[n]; }
+function R(re, w, n){ return { re, w, id: rid(n) }; }
+const RULES = [
+  R(/\bas an ai(?: language model| assistant| model)?\b/i, 4, 'Chatbot self-reference ("as an AI…")'),
+  R(/\b(?:knowledge cut-?off|regenerate response|as of my last (?:update|training))\b/i, 4, 'Chatbot interface artifact'),
+  R(/\bi hope this (?:helps|email finds you well|message finds you well|clarifies)\b/i, 2.4, 'Assistant sign-off ("I hope this helps")'),
+  R(/^\s*(?:certainly|absolutely|of course|sure)[!,.]/i, 1.6, 'Assistant-style opener ("Certainly!")'),
+  R(/\bgreat question\b/i, 2, 'Assistant-style opener ("Great question")'),
+  R(/\blet me know if you(?:'d| would)? (?:like|need|want|have)\b/i, 1.8, 'Assistant-style offer ("Let me know if…")'),
+  R(/\bfeel free to\b/i, 1.1, 'Assistant-style offer ("Feel free to…")'),
+  R(/\bhere(?:'s| is) (?:a|an|the|your) (?:breakdown|overview|summary|quick|step-by-step|refined|revised|rewritten|polished)\b/i, 1.8, 'Assistant framing ("Here\'s a breakdown")'),
+  R(/\b(?:it'?s|it is) (?:important|worth|crucial|essential) (?:to note|noting|to remember|to consider|to recognize)\b/i, 1.6, 'Stock hedge ("It\'s important to note")'),
+  R(/\btestament to\b/i, 1.4, 'Stock phrase: "a testament to"'),
+  R(/\bin today'?s (?:fast-paced|digital|ever-changing|modern|rapidly|interconnected)\b/i, 2, 'Stock opener: "In today\'s fast-paced…"'),
+  R(/\bever-(?:evolving|changing) (?:landscape|world|field)\b/i, 1.6, 'Stock phrase: "ever-evolving landscape"'),
+  R(/\bnavigat(?:e|es|ing) the (?:complexities|intricacies|challenges|landscape|nuances)\b/i, 1.4, 'Stock phrase: "navigate the complexities"'),
+  R(/\b(?:unlock|unleash|harness)(?:es|ing)? the (?:full |true )?(?:power|potential)\b/i, 1.6, 'Stock phrase: "unlock the potential"'),
+  R(/\bplays? an? (?:crucial|pivotal|vital|key|significant|integral) role\b/i, 1.4, 'Stock phrase: "plays a crucial role"'),
+  R(/\ba (?:myriad|plethora) of\b/i, 1.1, 'Stock phrase: "a myriad of"'),
+  R(/\bshed(?:s|ding)? light on\b/i, 1, 'Stock phrase: "shed light on"'),
+  R(/\b(?:let'?s )?dive (?:deep(?:er)? )?into\b|\bdeep dive\b/i, 1.1, 'Stock phrase: "dive into"'),
+  R(/\bwhether you'?re an? [^.!?]{1,40}? or an?\b/i, 1.5, 'Template: "Whether you\'re a… or a…"'),
+  R(/\blook no further\b|\bgame-?changer\b|\btake (?:it|your [a-z]+) to the next level\b/i, 1.4, 'Marketing stock phrase'),
+  R(/\bkey takeaways?\b|\bcomprehensive guide\b/i, 1.3, 'Listicle template ("Key takeaways")'),
+  R(/^\s*(?:in conclusion|in summary|to sum up|overall|ultimately|in short)\b,?/i, 1.1, 'Essay-template wrap-up'),
+  R(/^\s*(?:moreover|furthermore|additionally|notably|crucially|importantly|consequently|in addition)\b,?/i, 0.9, 'Formal transition at sentence start'),
+  R(/\b(?:not (?:just|only|merely)|isn'?t (?:just|only|merely)|more than just)\b[^.!?]{1,80}?(?:\bbut\b|\bit'?s\b|—|–|;)/i, 1.3, 'Contrast template: "not just X, but Y"'),
+  R(/\bit'?s not (?:about |just |only )?[^.!?,;]{1,50}[,;—–]\s*it'?s\b/i, 1.5, 'Contrast template: "It\'s not X, it\'s Y"'),
+  R(/\b(?:the result|the takeaway|the upshot|the key|the goal|the bottom line|the reality|the truth)(?: is)?:\s/i, 1, 'Colon reveal ("The result: …")'),
+  R(/\b[a-z]+, [a-z]+,? and [a-z]+\b/i, 0.3, 'List of three ("A, B, and C")'),
+  R(/^\s*from [^.!?,]{2,60} to [^.!?,]{2,60},/i, 1.3, 'Template: "From X to Y, …"'),
+  R(/\b(?:has|have) become an? (?:important|essential|integral|vital|key|indispensable|significant|crucial) part of\b/i, 1.6, 'Stock phrase: "has become an important part of"'),
+  R(/\b(?:it is|it'?s) (?:important|essential|crucial|vital|necessary) to (?!note|remember|consider|recognize)\w+/i, 1.1, 'Stock hedge ("It is important to…")'),
+  R(/\bwhile (?:it|they|this|these|ai|technology) (?:offers?|provides?|brings?|has|have|presents?) (?:many|numerous|several|significant|clear|great|some)? ?(?:benefits|advantages|opportunities)\b/i, 1.5, 'Balanced-take template ("While it offers many benefits…")'),
+  R(/\b(?:is |are )?(?:changing|transforming|revolutioni[sz]ing|reshaping) (?:the world|the way we|our world|how we)\b/i, 1.3, 'Stock phrase: "changing the world"'),
+  R(/\b(?:easier|faster|simpler|smarter|more efficient) and (?:faster|easier|simpler|smarter|more efficient|more convenient|more accessible)\b/i, 0.9, 'Paired comparatives ("easier and faster")'),
+  R(/\b(?:use (?:it|them|ai|technology|these tools) (?:responsibly|wisely|ethically))\b|\bresponsible (?:use|development|innovation)\b/i, 1.3, 'Stock closer: "use it responsibly"'),
+  R(/\b(?:our|people'?s) (?:daily |everyday )?lives\b/i, 0.7, 'Generic "our lives"'),
+  R(/\bless about [^.!?]{1,60}\bmore about\b|\bnot about [^.!?]{1,60}, but about\b/i, 1.4, 'Template: "less about X, more about Y"'),
+  R(/\b(?:looking back|i used to think|i used to believe|things changed when|the lesson i (?:took away|learned)|what i(?:'ve)? learned|here'?s what i learned|that'?s when i realized|it taught me)\b/i, 1.2, 'Reflective template ("Looking back…", "I used to think…")'),
+  R(/\*\*[^*\n]{2,80}\*\*/, 1.2, 'Markdown bold (**text**)'),
+  R(/^\s*#{1,6}\s+\S/, 1.4, 'Markdown heading (# …)'),
+  R(/^\s*(?:[-*•]|\d+\.)\s+\*\*/, 1.4, 'Bullet with bold lead-in'),
+  R(/^\s*(?:[✅✨✔➡⭐]|\uD83D[\uDC00-\uDEFF]|\uD83E[\uDD00-\uDEFF])/, 1.1, 'Emoji used as bullet or heading'),
+  R(/\b(?:lol|lmao|idk|tbh|imo|imho|gonna|wanna|kinda|sorta|dunno|omg|btw|ngl|ugh|meh|haha|hahaha)\b/i, -1.6, 'Casual slang (human-like)'),
+  R(/[!?]{2,}|\.{4,}/, -0.7, 'Repeated punctuation (human-like)'),
+  R(/(?:^|\s)i(?=[\s,.!?']|$)/, -1, 'Lowercase "i" (human-like)'),
+  R(/\b(?:teh|dont|didnt|doesnt|isnt|thats|alot|becuase|recieve|definately|untill|occured|seperate|wierd|truely)\b/, -1.1, 'Typo or missing apostrophe (human-like)'),
+];
+const ID_HID = rid('Contains hidden characters');
+const ID_SPACE = rid('Contains unusual space characters (e.g. U+202F)');
+const ID_HG = rid('Contains a word with look-alike letters');
+
+// ---------- vocabulary language models overuse (weights per occurrence) ----------
+const LEX = Object.create(null);
+function L(w, words){ for (const x of words.split(/\s+/)) if (x && !(x in LEX)) LEX[x] = w; }
+L(1.5, "delve delves delved delving tapestry tapestries testament showcasing showcase showcases showcased underscore underscores underscored underscoring meticulous meticulously intricate intricacies multifaceted realm realms commendable groundbreaking unparalleled invaluable noteworthy unwavering pivotal seamless seamlessly bustling vibrant embark embarks embarking embarked navigating interplay elevate elevates elevating empower empowers empowering empowerment fostering foster fosters fostered harness harnessing bolster bolstering bolsters streamline streamlines streamlined streamlining holistic transformative synergy synergies profound profoundly resonate resonates resonating resonated nuanced nuances cornerstone myriad plethora boasts garnered");
+L(0.8, "crucial crucially comprehensive enhance enhances enhancing enhanced enhancement leverage leverages leveraging leveraged robust landscape landscapes insights insightful valuable notably additionally furthermore moreover essential vital dynamic dynamics innovative innovation emphasize emphasizes emphasizing emphasized highlighting highlights highlighted facilitate facilitates facilitating optimize optimizing optimized mitigate mitigating mitigates cultivate cultivating cultivates prioritize prioritizing prioritizes actionable impactful meaningful meaningfully thoughtful thoughtfully genuinely intentional intentionally clarity journey ensuring ensure ensures ensured align aligns aligning aligned alignment framework frameworks paramount evolving nuance tailored navigate navigates navigated fundamentally inherently seamlessly encompasses encompassing serves strive striving thrive thriving");
+L(0.4, "significant significantly various diverse overall particularly specifically effectively effective efficient efficiency potential approach approaches strategies strategy strategic experiences individuals aspects aspect enables enable enabling provides providing offers offering ultimately consider considering importantly typically generally challenges opportunities opportunity unique ability critical complex complexity successful success growth focus focused approachable accessible engaging engagement community collaboration sustainable impact process processes resources solutions solution");
+
+// everyday long words, matched by their first 6 letters; long words outside this set count as specialist terms
+const GEN = new Set();
+("ability absolutely academic accepted access account achieve action actually addition address advance advantage affect afternoon against agreement already although amazing amount analysis another answer anything anyway apparent appear application approach appropriate argument around article aspect assessment assume attention attitude audience available average balance because become before beginning behavior behaviour believe benefit between beyond brother building business campaign capacity career careful category central century certain challenge change character choice church citizen climate collaboration colleague collection college combine comfort comment commercial commitment committee common communication community company compare comparison competition complete complex component computer concept concern conclusion condition conference confidence connection consequence consider consistent constant construction consumer contain content context continue contribute control conversation corporate council country couple course coverage create creative critical culture current customer daily database decision deliberate deliver demand department depend describe design despite detail determine develop device difference different difficult digital direction director discover discussion disease distance distribute document domestic economic economy education effective efficient effort election element emotional employee employment encourage energy engagement engineer enjoy enough environment especially establish estimate evaluate evening eventually everybody everyone everything evidence exactly example excellent exchange exercise existing expect expectation experience experiment expert explain explanation express extend external facility factor failure familiar family feature federal feeling finally finance following foreign forget formal forward foundation framework frequent friend function funding further general generation government gradually greater growing guidance happen healthy history holiday however hundred husband identify imagine immediate impact implement importance important improve include increase independent indicate individual industry influence information initial initiative instead institution interest internal international interview introduce investment involve issue journey judgment knowledge language largely leadership learning lifestyle limited listen literature location machine maintain majority manage marketing material matter meaning measure medical meeting member memory mention message method military million minister minute mission mistake moment morning movement natural nature necessary negative network neutral nothing notice number numerous objective obvious occasion offer officer official operation opinion opportunity option ordinary organization organisation original outcome outside overall particular partner patient pattern payment people perfect perform perhaps period permanent personal perspective physical picture planning platform political popular population position positive possible potential practical practice prepare present president pressure pretty prevent previous primary principle priority private probably problem procedure process produce product professional program progress project property proposal protect provide public purpose quality quarter question quickly rather reaction reading reality realize really reason recently recognize recommend record reduce reflect regular relationship release relevant remain remember remove report represent request require research resource respond response responsibility result return review rights science season section security service session several shopping significant similar simple simply situation society software someone something sometimes specific standard station statement strategy strength stress structure student subject success suddenly suggest summary support suppose surface survey system teacher technology television themselves theory therefore thinking thousand through together tomorrow tonight towards tradition training transport treatment trouble typical understand unless usually various version village violence visible vision visitor weather weekend welcome whatever whether without working writing yourself productive informal sustainable consumption awareness affordable temperature reliable schedule appreciate uncomfortable accomplish exhausted priorities stability durable excited employer neighbor neighbour delicious beautiful wonderful terrible horrible probably basically literally honestly seriously totally exciting interested interesting surprised surprising worried pleasure anxious confused disappointed grateful hospital restaurant kitchen bedroom children daughter teenager weekend vacation birthday wedding football baseball basketball").split(' ').forEach(w => { if (w.length >= 6) GEN.add(w.slice(0, 6)); });
+
+const ING = /,\s+(?:ensuring|making|allowing|highlighting|creating|providing|offering|enabling|leading|reflecting|showcasing|helping|giving|adding|fostering|turning|leaving|reducing|improving|underscoring|emphasizing|resulting|demonstrating|signaling|signalling|marking|setting|keeping|bringing|transforming|positioning|paving|contributing|solidifying|cementing|serving|inviting|capturing|blending|offering|revealing|illustrating)\b/gi;
+const NOM = /(?:tion|sion|ment|ity|ness|ance|ence|ism)s?$/;
+const COMMON_ACR = new Set(['AI', 'US', 'USA', 'UK', 'EU', 'UN', 'CEO', 'IT', 'TV', 'OK', 'AM', 'PM', 'ID', 'PC', 'FAQ', 'HR', 'PR', 'ML', 'LLM', 'LLMs', 'API', 'APIs', 'GPT', 'UI', 'UX', 'IoT', 'VR', 'AR', 'STEM', 'NGO', 'NGOs', 'SEO', 'ROI', 'KPI', 'KPIs', 'B2B', 'SaaS']);
+const FP = new Set(['i', 'me', 'my', 'mine', 'myself', "i'm", "i've", "i'd", "i'll"]);
+
+// passage-level features: [key, label when it pushes toward AI, label when it pushes toward human]
+const FEAT = [
+  ['lex', 'AI-favored vocabulary', 'Little AI-favored vocabulary'],
+  ['ing', 'Trailing "-ing" clauses (", ensuring…", ", making…")', ''],
+  ['burst', 'Even sentence lengths (low burstiness)', 'Varied sentence lengths (human-like)'],
+  ['awl', 'Long words on average', 'Short, plain words'],
+  ['nom', 'Many abstract nouns (-tion, -ment, -ity)', 'Few abstract nouns'],
+  ['fp', '', 'Personal voice (I, me, my)'],
+  ['excl', '', 'Exclamation marks'],
+  ['dig', '', 'Specific numbers, dates and technical terms'],
+  ['pn', 'Generic, few names or places', 'Names, places and proper nouns'],
+  ['paren', '', 'Parenthetical asides'],
+  ['this', 'Sentences opening with "This/These…"', ''],
+  ['dash', 'Em dashes', ''],
+  ['phrase', 'AI stock phrases and formatting', ''],
+  ['human', '', 'Slang, typos or casual punctuation'],
+  ['punct', 'Polished punctuation and capitalization', 'Loose punctuation or capitalization'],
+  ['quote', '', 'Quotes or dialogue'],
+  ['quest', '', 'Questions'],
+  ['short', '', 'Very short sentences (human-like)'],
+  ['para', 'Evenly sized paragraphs', 'Uneven paragraph sizes'],
+  ['slen', '', 'Long, dense sentences (human-like)'],
+  ['spec', 'Generic vocabulary, few specialist terms', 'Specialist or technical vocabulary'],
+];
+const NF = FEAT.length;
+const BIAS = 0.2;
+
+function segment(text){
+  const n = text.length, starts = [0];
+  let last = 0;
+  function cut(end){
+    while (end - last > 700){
+      let c = text.lastIndexOf(' ', last + 600);
+      c = c <= last ? last + 600 : c + 1;
+      starts.push(c); last = c;
+    }
+    if (end > last && end < n){ starts.push(end); last = end; }
+  }
+  const re = /[.!?…]+["'”’)\]]*(?=\s)|\n/g;
+  let m;
+  const ABBR = /(?:\b(?:e\.g|i\.e|etc|vs|Mr|Mrs|Ms|Dr|St|Jr|Sr|Prof|Inc|Ltd|Co|No|Fig|approx|cf|al)|(?:^|\s)[A-Z])\.$/;
+  while ((m = re.exec(text))){
+    if (m[0] === '.' && ABBR.test(text.slice(Math.max(0, m.index - 8), m.index + 1))) continue;
+    let end = m.index + m[0].length;
+    while (end < n){ const c = text.charCodeAt(end); if (c === 32 || c === 9 || c === 10 || c === 13) end++; else break; }
+    cut(end);
+    if (re.lastIndex < end) re.lastIndex = end;
+  }
+  cut(n);
+  return Int32Array.from(starts);
+}
+
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const sig = z => 1 / (1 + Math.exp(-z));
+// calibrated on held-out human and AI samples: z 0.55 -> 70% (AI-style), z 0 -> 45% (mixed)
+const prob = z => sig(1.9 * z - 0.2);
+
+function analyze(text, progress){
+  const t0 = Date.now();
+  const n = text.length;
+  const starts = segment(text);
+  const S = starts.length;
+  const endOf = i => (i + 1 < S ? starts[i + 1] : n);
+  const sIdx = pos => { let lo = 0, hi = S - 1; while (lo < hi){ const mid = (lo + hi + 1) >> 1; if (starts[mid] <= pos) lo = mid; else hi = mid - 1; } return lo; };
+
+  // per-sentence measurements
+  const K = 23; // stats per sentence (17 quotes, 18 questions, 19 very short, 20 words counted for length, 21 long words, 22 specialist long words)
+  const st = new Float32Array(S * K);
+  // 0 words,1 lex,2 ing,3 letters,4 nom,5 fp,6 excl,7 digits,8 pn,9 paren,10 thisStart,11 dash,12 rulePos,13 ruleNeg,14 latin,15 sloppy,16 paraEnd
+  const rsum = new Float32Array(S);
+  const reasons = new Array(S).fill(null);
+  let words = 0, emdash = 0;
+  for (let i = 0; i < S; i++){
+    const s = text.slice(starts[i], endOf(i));
+    const all = s.match(/\S+/g);
+    const wAll = all ? all.length : 0;
+    if (!wAll) continue;
+    words += wAll;
+    const toks = s.match(/[A-Za-z][A-Za-z'’-]*/g) || [];
+    const o = i * K;
+    let lex = 0, letters = 0, nom = 0, fp = 0, pn = 0, acr = 0, lenW = 0, longW = 0, rareW = 0;
+    for (let k = 0; k < toks.length; k++){
+      const t = toks[k];
+      const lw = t.toLowerCase().replace(/’/g, "'");
+      const lx = LEX[lw]; if (lx) lex += lx;
+      let rare = false;
+      if (t.length >= 8 && !(k > 0 && t[0] >= 'A' && t[0] <= 'Z')){
+        longW++;
+        if (!lx && !GEN.has(lw.slice(0, 6))){ rare = true; rareW++; }
+      }
+      if (!rare){ letters += Math.min(t.length, 10); lenW++; }
+      if (t.length >= 2 && t.length <= 7 && /^[A-Z][A-Za-z]*[A-Z][A-Za-z]*$/.test(t) && !COMMON_ACR.has(t)) acr++;
+      if (t.length >= 7 && NOM.test(lw)) nom++;
+      if (FP.has(lw)) fp++;
+      if (k > 0 && t.length > 1 && t[0] >= 'A' && t[0] <= 'Z' && t[1] >= 'a' && t[1] <= 'z' && !/^I'/.test(t)) pn++;
+    }
+    st[o] = toks.length; st[o + 1] = lex; st[o + 3] = letters; st[o + 4] = nom; st[o + 5] = fp; st[o + 8] = pn;
+    ING.lastIndex = 0; st[o + 2] = (s.match(ING) || []).length;
+    let ex = 0, par = 0, d = 0;
+    for (let k = 0; k < s.length; k++){ const c = s.charCodeAt(k); if (c === 33) ex++; else if (c === 40) par++; else if (c === 0x2014) d++; }
+    par -= (s.match(/\(([A-Z][A-Za-z]{1,6})\)/g) || []).filter(x => COMMON_ACR.has(x.slice(1, -1))).length; // "(AI)"-style definitions are not asides
+    d += (s.match(/ – | -- /g) || []).length;
+    emdash += d;
+    st[o + 6] = ex; st[o + 7] = (s.match(/\d+/g) || []).length + acr; st[o + 9] = par; st[o + 11] = d;
+    st[o + 10] = /^\s*(?:This|These)\b/.test(s) ? 1 : 0;
+    st[o + 14] = toks.length >= wAll * 0.5 ? 1 : 0;
+    // sloppy: sentence starts lowercase, missing final punctuation in a long sentence, or double spaces
+    const trimmed = s.trim();
+    let sloppy = 0;
+    if (/^[a-z]/.test(trimmed)) sloppy++;
+    if (toks.length > 6 && !/[.!?…:"'”’)\]]$/.test(trimmed) && !/^\s*(?:[-*•#]|\d+\.)/.test(trimmed)) sloppy += 0.5;
+    if (/\S {2,}\S/.test(s)) sloppy += 0.5;
+    if (/\s[,.]/.test(trimmed)) sloppy += 0.5;
+    st[o + 15] = sloppy;
+    st[o + 16] = /\n\s*\n\s*$/.test(s) ? 1 : 0;
+    st[o + 17] = Math.min(2, (s.match(/["“”]/g) || []).length / 2);
+    st[o + 18] = (s.match(/\?/g) || []).length ? 1 : 0;
+    st[o + 20] = lenW; st[o + 21] = longW; st[o + 22] = rareW;
+    st[o + 19] = toks.length > 0 && toks.length < 6 && !/^\s*(?:[-*•#]|\d+\.)/.test(s) && !/,\s*$/.test(trimmed) ? 1 : 0;
+    let pos = 0, neg = 0; const list = [];
+    for (let r = 0; r < RULES.length; r++){
+      const rule = RULES[r];
+      if (rule.re.test(s)){ list.push(rule.id, rule.w); if (rule.w > 0) pos += rule.w; else neg += rule.w; }
+    }
+    st[o + 12] = pos; st[o + 13] = neg;
+    rsum[i] = pos + neg;
+    if (list.length) reasons[i] = list;
+    if ((i & 1023) === 0) progress(4 + 56 * i / S);
+  }
+
+  // hidden-character scan
+  const counts = new Array(8).fill(0), first = new Array(8).fill(-1);
+  const flags = new Uint8Array(S);
+  const decoded = [], hgWords = [];
+  const mark = (pos, bit) => { flags[sIdx(pos)] |= bit; };
+  const hit = (cat, pos) => { counts[cat]++; if (first[cat] < 0) first[cat] = pos; };
+  let tagBuf = '', tagStart = -1, vsBytes = [], vsStart = -1, hgEnd = -1;
+  const dec = typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-8') : null;
+  function flushTag(){
+    if (tagStart >= 0){
+      if (tagBuf.trim() && decoded.length < 50) decoded.push({ kind: 'Tag characters', pos: tagStart, text: tagBuf.slice(0, 2000) });
+      tagBuf = ''; tagStart = -1;
+    }
+  }
+  function flushVs(){
+    if (vsStart >= 0){
+      if (vsBytes.length >= 2){
+        hit(5, vsStart); mark(vsStart, 1);
+        if (dec && decoded.length < 50){
+          let t = '';
+          try { t = dec.decode(new Uint8Array(vsBytes)); } catch (e) {}
+          t = t.replace(/[\u0000-\u0008\u000E-\u001F\uFFFD]/g, '');
+          if (t.trim()) decoded.push({ kind: 'Variation selectors', pos: vsStart, text: t.slice(0, 2000) });
+        }
+      }
+      vsBytes = []; vsStart = -1;
+    }
+  }
+  const isLetter = c => (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || (c >= 0xC0 && c <= 0x24F && c !== 0xD7 && c !== 0xF7) || (c >= 0x370 && c <= 0x3FF) || (c >= 0x400 && c <= 0x4FF);
+  const isLatin = c => (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || (c >= 0xC0 && c <= 0x24F && c !== 0xD7 && c !== 0xF7);
+  function checkWord(j){
+    let a = j, b = j;
+    while (a > 0 && isLetter(text.charCodeAt(a - 1))) a--;
+    while (b < n && isLetter(text.charCodeAt(b))) b++;
+    hgEnd = b;
+    for (let k = a; k < b; k++){
+      if (isLatin(text.charCodeAt(k))){
+        hit(7, a); mark(a, 4);
+        if (hgWords.length < 200) hgWords.push({ word: text.slice(a, b), pos: a });
+        return;
+      }
+    }
+  }
+  for (let j = 0; j < n; j++){
+    const c = text.charCodeAt(j);
+    let cp = c, w = 1;
+    if (c >= 0xD800 && c <= 0xDBFF && j + 1 < n){
+      const d = text.charCodeAt(j + 1);
+      if (d >= 0xDC00 && d <= 0xDFFF){ cp = ((c - 0xD800) << 10) + (d - 0xDC00) + 0x10000; w = 2; }
+    }
+    let vb = -1;
+    if (cp >= 0xFE00 && cp <= 0xFE0F) vb = cp - 0xFE00;
+    else if (cp >= 0xE0100 && cp <= 0xE01EF) vb = cp - 0xE0100 + 16;
+    if (vb >= 0){ if (vsStart < 0) vsStart = j; vsBytes.push(vb); j += w - 1; continue; }
+    if (vsStart >= 0) flushVs();
+    if (cp >= 0xE0000 && cp <= 0xE007F){
+      hit(4, j); mark(j, 1);
+      if (tagStart < 0) tagStart = j;
+      if (cp >= 0xE0020 && cp <= 0xE007E) tagBuf += String.fromCharCode(cp - 0xE0000);
+      j += w - 1; continue;
+    }
+    if (tagStart >= 0) flushTag();
+    if (w === 2){ j++; continue; }
+    if (c < 0x80) continue;
+    let cat = -1;
+    if (c === 0x200B || c === 0x200C || (c >= 0x2060 && c <= 0x2064) || c === 0x180E || (c === 0xFEFF && j > 0)) cat = 0;
+    else if (c === 0x200D){
+      const pv = j > 0 ? text.charCodeAt(j - 1) : 0, nx = j + 1 < n ? text.charCodeAt(j + 1) : 0;
+      const emoji = (pv >= 0xDC00 && pv <= 0xDFFF) || pv === 0xFE0F || (nx >= 0xD800 && nx <= 0xDBFF) || (pv >= 0x2600 && pv <= 0x27BF);
+      if (!emoji) cat = 0;
+    }
+    else if (c === 0x202F || (c >= 0x2000 && c <= 0x200A) || c === 0x205F || c === 0x3000) cat = 1;
+    else if (c === 0x00A0) cat = 2;
+    else if (c === 0x200E || c === 0x200F || (c >= 0x202A && c <= 0x202E) || (c >= 0x2066 && c <= 0x2069) || c === 0x061C) cat = 3;
+    else if (c === 0x00AD) cat = 6;
+    else if ((c >= 0x370 && c <= 0x3FF) || (c >= 0x400 && c <= 0x4FF)){ if (j >= hgEnd) checkWord(j); continue; }
+    if (cat >= 0){
+      hit(cat, j);
+      if (cat === 0 || cat === 3) mark(j, 1);
+      else if (cat === 1 || cat === 6) mark(j, 2);
+    }
+    if ((j & 0xFFFFF) === 0) progress(60 + 15 * j / n);
+  }
+  flushVs(); flushTag();
+  progress(76);
+  for (let i = 0; i < S; i++){
+    const f = flags[i];
+    if (!f || !st[i * K]) continue;
+    const list = reasons[i] || [];
+    let add = 0;
+    if (f & 1){ list.push(ID_HID, 1.2); add += 1.2; }
+    if (f & 2){ list.push(ID_SPACE, 0.6); add += 0.6; }
+    if (f & 4){ list.push(ID_HG, 0.8); add += 0.8; }
+    reasons[i] = list; rsum[i] += add; st[i * K + 12] += add;
+  }
+
+  // group sentences into passages of roughly 90 words, breaking at paragraph ends
+  const blockOf = new Int32Array(S).fill(-1);
+  const bStart = [];
+  let B = 0, acc = 0, open = false;
+  for (let i = 0; i < S; i++){
+    const w = st[i * K];
+    if (!w && !st[i * K + 14]){ if (open) blockOf[i] = B - 1; continue; }
+    if (!open){ bStart.push(i); B++; open = true; acc = 0; }
+    blockOf[i] = B - 1;
+    acc += w;
+    if (acc >= 110 || (acc >= 45 && st[i * K + 16])) open = false;
+  }
+  // per-block sums
+  const BK = K + 2; // + sentences, sum len^2
+  const bs = new Float64Array(Math.max(1, B) * BK);
+  for (let i = 0; i < S; i++){
+    const b = blockOf[i]; if (b < 0) continue;
+    const w = st[i * K]; if (!w) continue;
+    const o = b * BK, so = i * K;
+    for (let k = 0; k < K; k++) bs[o + k] += st[so + k];
+    bs[o + K] += 1; bs[o + K + 1] += w * w;
+  }
+  // paragraph evenness across the whole document
+  let paraC = 0;
+  {
+    let pc = 0, ps = 0, ps2 = 0, cur = 0;
+    for (let i = 0; i < S; i++){
+      cur += st[i * K];
+      if (st[i * K + 16] || i === S - 1){ if (cur >= 8){ pc++; ps += cur; ps2 += cur * cur; } cur = 0; }
+    }
+    if (pc >= 3){
+      const mean = ps / pc, cv = Math.sqrt(Math.max(0, ps2 / pc - mean * mean)) / mean;
+      paraC = clamp(2 * (0.4 - cv), -1, 0.6);
+    }
+  }
+  // score each block from its own sums plus its neighbours' (window of 3 passages)
+  const bz = new Float32Array(B), bc = new Float32Array(B * NF);
+  const win = new Float64Array(BK);
+  for (let b = 0; b < B; b++){
+    win.fill(0);
+    for (let q = Math.max(0, b - 1); q <= Math.min(B - 1, b + 1); q++){
+      const wgt = q === b ? 1 : 0.5, o = q * BK;
+      for (let k = 0; k < BK; k++) win[k] += bs[o + k] * wgt;
+    }
+    const W = win[0], Sn = win[K], latin = win[14] / Math.max(1, Sn);
+    const c = bc.subarray(b * NF, b * NF + NF);
+    if (W < 3 || latin < 0.5){ bz[b] = BIAS; continue; }
+    const per100 = x => x / W * 100;
+    c[0] = 0.42 * Math.min(per100(win[1]), 10) - 0.5;
+    c[1] = 3 * Math.min(win[2] / Sn, 0.6);
+    if (Sn >= 4){
+      const mean = W / Sn, cv = Math.sqrt(Math.max(0, win[K + 1] / Sn - mean * mean)) / mean;
+      c[2] = clamp(3.4 * (0.5 - cv), -1.5, 1.1);
+    }
+    c[19] = clamp(-0.13 * (W / Sn - 26), -1.6, 0);
+    c[3] = clamp(1.2 * (win[3] / Math.max(1, win[20]) - 4.55), -1, 1);
+    if (win[21] >= 4) c[20] = clamp(-2.5 * (win[22] / win[21] - 0.5), -1, 0.5);
+    c[4] = clamp(0.15 * (per100(win[4]) - 3), -0.6, 0.8);
+    c[5] = -0.12 * Math.min(per100(win[5]), 8);
+    c[6] = -1.6 * Math.min(win[6] / Sn, 0.5);
+    c[7] = -0.16 * Math.min(per100(win[7]), 8);
+    c[8] = 0.35 - 0.17 * Math.min(per100(win[8]), 10);
+    c[9] = -0.3 * Math.min(per100(win[9]), 3);
+    c[10] = 1.5 * Math.min(win[10] / Sn, 0.5);
+    c[11] = 0.8 * Math.min(win[11] / Sn, 1);
+    c[12] = 0.9 * win[12] / Sn;
+    c[13] = 1.0 * win[13] / Sn;
+    c[14] = 0.3 - 1.4 * Math.min(win[15] / Sn, 1);
+    c[15] = -1.4 * Math.min(win[17] / Sn, 0.6);
+    c[16] = -2.2 * Math.min(win[18] / Sn, 0.4);
+    c[17] = -2.4 * Math.min(win[19] / Sn, 0.4);
+    c[18] = paraC;
+    // signals based on something being absent (no names, tidy punctuation, no jargon) need a longer sample
+    const absent = Math.min(1, W / 90);
+    for (const k of [8, 14, 20]) if (c[k] > 0) c[k] *= absent;
+    let z = BIAS;
+    for (let k = 0; k < NF; k++) z += c[k];
+    // a short text gives less evidence: pull toward a cautious, slightly human-leaning prior
+    const conf = Math.min(1, W / 80), PRIOR = -0.2;
+    bz[b] = PRIOR + (z - PRIOR) * conf;
+    if ((b & 255) === 0) progress(78 + 14 * b / Math.max(1, B));
+  }
+
+  // sentence scores: passage score plus this sentence's own rules
+  const p = new Float32Array(S);
+  let scored = 0, aiC = 0, mixC = 0, aiN = 0, mixN = 0, pSum = 0, sentN = 0;
+  for (let i = 0; i < S; i++){
+    const b = blockOf[i];
+    if (b < 0 || !st[i * K]){ p[i] = -1; continue; }
+    const z = bz[b] + 0.5 * clamp(rsum[i], -3, 3);
+    const pr = prob(z);
+    p[i] = pr;
+    const len = endOf(i) - starts[i];
+    scored += len; pSum += pr * len; sentN++;
+    if (pr >= 0.7){ aiC += len; aiN++; } else if (pr >= 0.45){ mixC += len; mixN++; }
+  }
+  const freqAi = new Array(REASONS.length).fill(0);
+  for (let i = 0; i < S; i++){
+    const l = reasons[i]; if (!l || p[i] < 0.7) continue;
+    for (let q = 0; q < l.length; q += 2) if (l[q + 1] > 0) freqAi[l[q]]++;
+  }
+  const featAi = new Array(NF).fill(0);
+  const bp = new Float32Array(B);
+  for (let b = 0; b < B; b++) bp[b] = prob(bz[b]);
+  for (let b = 0; b < B; b++){ if (bp[b] < 0.7) continue; for (let k = 0; k < NF; k++) if (bc[b * NF + k] >= 0.25) featAi[k]++; }
+  progress(100);
+  return {
+    starts, p, blockOf, bz, bp, bc, feat: FEAT, reasons, names: REASONS, freqAi, featAi, blocks: B,
+    hidden: { counts, first, decoded, hgWords },
+    stats: { chars: n, words, sentences: sentN, scored, aiC, mixC, aiN, mixN, mean: scored ? pSum / scored : 0, emdash },
+    ms: Date.now() - t0,
+  };
+}
+
+self.onmessage = e => {
+  try {
+    let lastPost = 0;
+    const r = analyze(e.data.text, pct => { const now = Date.now(); if (now - lastPost > 60 || pct >= 100){ lastPost = now; self.postMessage({ type: 'progress', pct }); } });
+    self.postMessage({ type: 'done', r });
+  } catch (err) {
+    self.postMessage({ type: 'error', message: String((err && err.message) || err) });
+  }
+};
+</script>
+
+<script>
+(function(){
+"use strict";
+const MAX = 5000000, PAGE_CHARS = 14000;
+const $ = id => document.getElementById(id);
+const ta = $('input'), doc = $('doc'), statusEl = $('status');
+const fmt = v => Number(v).toLocaleString('en-US');
+const sig = z => 1 / (1 + Math.exp(-z));
+let runId = 0, wk = null, R = null, text = '', S = 0, pageStarts = [0], page = 0, sel = -1;
+
+const CATS = [
+  { name: 'Zero-width characters', what: 'U+200B, U+200C, U+200D, U+2060, U+FEFF, U+180E. Invisible and take up no space.', why: 'Can be inserted as hidden marks or for tracking. Some editors and copy-paste also leave them.' },
+  { name: 'Unusual spaces', what: 'Narrow no-break space U+202F, thin and hair spaces U+2000–U+200A, U+205F, U+3000.', why: 'U+202F has been reported in some chatbot output. Also normal in French typography and some editors.' },
+  { name: 'No-break spaces', what: 'U+00A0.', why: 'Very common in text copied from web pages and Word. A weak signal on its own, so it does not raise sentence scores.' },
+  { name: 'Direction controls', what: 'U+200E, U+200F, U+202A–U+202E, U+2066–U+2069, U+061C.', why: 'Invisibly change text direction. Rare in normal prose; used to hide or reorder text.' },
+  { name: 'Unicode tag characters', what: 'U+E0000–U+E007F: invisible copies of ASCII letters.', why: 'Can carry a hidden message inside normal-looking text. Any message found is decoded below.' },
+  { name: 'Variation-selector runs', what: 'Two or more variation selectors in a row (U+FE00–U+FE0F, U+E0100–U+E01EF).', why: 'Can hide bytes behind one visible character. A single selector after an emoji is normal and is ignored.' },
+  { name: 'Soft hyphens', what: 'U+00AD.', why: 'Invisible unless a line breaks there. Left by some publishing tools.' },
+  { name: 'Look-alike letters', what: 'Words that mix Latin letters with Cyrillic or Greek ones, such as a Cyrillic "е" inside an English word.', why: 'Used to fingerprint copies or to slip past filters and detectors.' },
+];
+
+const HID_RE = /[&<>]|(?:\uDB40[\uDC00-\uDC7F])+|(?:[︀-️]|\uDB40[\uDD00-\uDDEF]){2,}|[︀-︎]|\uDB40[\uDD00-\uDDEF]|[​-‏⁠-⁤﻿᠎­‪-‮⁦-⁩؜   -  　]/g;
+const LABEL = { 0x200B:['ZWSP','Zero-width space U+200B'], 0x200C:['ZWNJ','Zero-width non-joiner U+200C'], 0x200D:['ZWJ','Zero-width joiner U+200D'], 0x200E:['LRM','Left-to-right mark U+200E'], 0x200F:['RLM','Right-to-left mark U+200F'], 0x2060:['WJ','Word joiner U+2060'], 0xFEFF:['BOM','Zero-width no-break space U+FEFF'], 0x180E:['MVS','Mongolian vowel separator U+180E'], 0x00AD:['SHY','Soft hyphen U+00AD'], 0x00A0:['NBSP','No-break space U+00A0'], 0x202F:['NNBSP','Narrow no-break space U+202F'], 0x205F:['MMSP','Medium math space U+205F'], 0x3000:['IDSP','Ideographic space U+3000'], 0x061C:['ALM','Arabic letter mark U+061C'] };
+const hex = c => 'U+' + c.toString(16).toUpperCase().padStart(4, '0');
+function esc(s){ return s.replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]); }
+function pill(lab, title, soft){ return '<span class="hid' + (soft ? ' soft' : '') + '" title="' + esc(title) + '">' + esc(lab) + '</span>'; }
+function renderText(s){
+  return s.replace(HID_RE, (m, off, str) => {
+    if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;';
+    const c = m.charCodeAt(0);
+    if (c === 0xDB40){
+      const d = m.charCodeAt(1);
+      if (d >= 0xDC00 && d <= 0xDC7F){
+        let msg = ''; for (let k = 0; k < m.length; k += 2){ const cp = m.charCodeAt(k + 1) - 0xDC00; if (cp >= 0x20 && cp <= 0x7E) msg += String.fromCharCode(cp); }
+        return pill('TAG×' + (m.length / 2), 'Hidden tag characters' + (msg ? ': "' + msg.slice(0, 200) + '"' : ''));
+      }
+      const k = Array.from(m).length;
+      return pill(k > 1 ? 'VS×' + k : 'VS', 'Variation selector(s)');
+    }
+    if (c >= 0xFE00 && c <= 0xFE0F){ const k = Array.from(m).length; return pill(k > 1 ? 'VS×' + k : 'VS', 'Variation selector(s)'); }
+    if (c === 0x200D){
+      const pv = off > 0 ? str.charCodeAt(off - 1) : 0, nx = off + 1 < str.length ? str.charCodeAt(off + 1) : 0;
+      if ((pv >= 0xDC00 && pv <= 0xDFFF) || pv === 0xFE0F || (nx >= 0xD800 && nx <= 0xDBFF) || (pv >= 0x2600 && pv <= 0x27BF)) return m;
+    }
+    const l = LABEL[c] || ((c >= 0x2000 && c <= 0x200A) ? ['SP', 'Special-width space ' + hex(c)] : (c >= 0x202A && c <= 0x202E) || (c >= 0x2066 && c <= 0x2069) ? ['BIDI', 'Direction control ' + hex(c)] : ['?', hex(c)]);
+    const out = pill(l[0], l[1], c === 0x00A0);
+    return (c === 0x00A0 || c === 0x202F || (c >= 0x2000 && c <= 0x200A) || c === 0x205F || c === 0x3000) ? out + ' ' : out;
+  });
+}
+
+const HG_MAP = {'а':'a','е':'e','о':'o','р':'p','с':'c','у':'y','х':'x','і':'i','ј':'j','ѕ':'s','ԁ':'d','А':'A','В':'B','Е':'E','К':'K','М':'M','Н':'H','О':'O','Р':'P','С':'C','Т':'T','Х':'X','У':'Y','І':'I','Ј':'J','Ѕ':'S','ο':'o','α':'a','ν':'v','ρ':'p','τ':'t','Ο':'O','Α':'A','Β':'B','Ε':'E','Ζ':'Z','Η':'H','Ι':'I','Κ':'K','Μ':'M','Ν':'N','Ρ':'P','Τ':'T','Χ':'X','Υ':'Y'};
+function clean(t){
+  return t
+    .replace(/(?:\uDB40[\uDC00-\uDC7F])+/g, '')
+    .replace(/(?:[︀-️]|\uDB40[\uDD00-\uDDEF]){2,}/g, '')
+    .replace(/[︀-︎]|\uDB40[\uDD00-\uDDEF]/g, '')
+    .replace(/‍/g, (m, off, str) => {
+      const pv = off > 0 ? str.charCodeAt(off - 1) : 0, nx = off + 1 < str.length ? str.charCodeAt(off + 1) : 0;
+      return ((pv >= 0xDC00 && pv <= 0xDFFF) || pv === 0xFE0F || (nx >= 0xD800 && nx <= 0xDBFF) || (pv >= 0x2600 && pv <= 0x27BF)) ? m : '';
+    })
+    .replace(/[​‌⁠-⁤᠎﻿­‎‏‪-‮⁦-⁩؜]/g, '')
+    .replace(/[   -  　]/g, ' ')
+    .replace(/[A-Za-zÀ-ɏͰ-ϿЀ-ӿ]+/g, w => (/[A-Za-z]/.test(w) && /[Ͱ-ϿЀ-ӿ]/.test(w)) ? w.replace(/[Ͱ-ϿЀ-ӿ]/g, ch => HG_MAP[ch] || ch) : w);
+}
+
+function setStatus(msg, err){ statusEl.textContent = msg; statusEl.classList.toggle('err', !!err); }
+function updCount(){ $('count').textContent = fmt(ta.value.length) + ' / 5,000,000 characters'; }
+
+// loading bar
+const prog = $('prog'), progFill = $('progfill'), progPct = $('progpct'), progLab = $('proglab');
+let progShown = 0, progHide = 0;
+function progStart(){
+  clearTimeout(progHide);
+  prog.hidden = false; prog.classList.remove('done');
+  progShown = Date.now(); progSet(0, 'Reading the text…');
+  document.body.classList.add('busy');
+}
+function progSet(pct, label){
+  pct = Math.max(0, Math.min(100, pct));
+  progFill.style.transform = 'scaleX(' + (pct / 100) + ')';
+  progPct.textContent = Math.round(pct) + '%';
+  prog.setAttribute('aria-valuenow', String(Math.round(pct)));
+  if (label) progLab.textContent = label;
+}
+function progLabel(pct){
+  return pct < 60 ? 'Measuring each sentence…' : pct < 76 ? 'Scanning for hidden characters…' : pct < 95 ? 'Scoring passages…' : 'Finishing up…';
+}
+function progEnd(ok){
+  const wait = Math.max(0, 450 - (Date.now() - progShown));
+  return new Promise(res => setTimeout(() => {
+    progSet(100, ok ? 'Done' : 'Stopped');
+    prog.classList.add('done');
+    document.body.classList.remove('busy');
+    progHide = setTimeout(() => { prog.hidden = true; }, 900);
+    res();
+  }, wait));
+}
+function setBusy(b){ $('run').disabled = b; $('run').textContent = b ? 'Analyzing…' : 'Analyze'; }
+
+function makeWorker(){
+  const url = URL.createObjectURL(new Blob([$('worker-src').textContent], { type: 'text/javascript' }));
+  const w = new Worker(url);
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  return w;
+}
+
+function run(){
+  let t = ta.value;
+  if (!t.trim()){ setStatus('Paste text or upload a file first.', true); return; }
+  if (t.length > MAX) t = t.slice(0, MAX);
+  if (wk) wk.terminate();
+  try { wk = makeWorker(); } catch (e) { setStatus('Your browser blocked the analyzer: ' + e.message, true); return; }
+  const id = ++runId, me = wk;
+  setBusy(true); setStatus(''); progStart();
+  me.onmessage = ev => {
+    if (id !== runId) return;
+    const m = ev.data;
+    if (m.type === 'progress') progSet(m.pct, progLabel(m.pct));
+    else if (m.type === 'done'){ me.terminate(); if (wk === me) wk = null; const r = m.r; progEnd(true).then(() => { if (id !== runId) return; setBusy(false); text = t; show(r); }); }
+    else if (m.type === 'error'){ progEnd(false).then(() => { if (id !== runId) return; setBusy(false); setStatus('Analysis failed: ' + m.message, true); }); }
+  };
+  me.onerror = e => { if (id !== runId) return; progEnd(false).then(() => { if (id !== runId) return; setBusy(false); setStatus('Analysis failed: ' + (e.message || 'background worker error'), true); }); };
+  wk.postMessage({ text: t });
+}
+
+function endOf(i){ return i + 1 < S ? R.starts[i + 1] : text.length; }
+function sIdx(pos){ const st = R.starts; let lo = 0, hi = S - 1; while (lo < hi){ const mid = (lo + hi + 1) >> 1; if (st[mid] <= pos) lo = mid; else hi = mid - 1; } return lo; }
+function pageOf(i){ let lo = 0, hi = pageStarts.length - 1; while (lo < hi){ const mid = (lo + hi + 1) >> 1; if (pageStarts[mid] <= i) lo = mid; else hi = mid - 1; } return lo; }
+function level(pv){ return pv < 0 ? -1 : pv >= 0.7 ? 2 : pv >= 0.45 ? 1 : 0; }
+
+function show(r){
+  R = r; S = r.starts.length; sel = -1;
+  pageStarts = [0]; let acc = 0;
+  for (let i = 0; i < S; i++){ const len = endOf(i) - r.starts[i]; if (acc > 0 && acc + len > PAGE_CHARS){ pageStarts.push(i); acc = 0; } acc += len; }
+  renderSummary(); renderTop(); renderHidden();
+  $('detail').innerHTML = '<p class="note">Click any sentence in the document to see what raised or lowered its score.</p>';
+  $('maplen').textContent = fmt(text.length) + ' characters';
+  goPage(0, false); drawMap();
+  setStatus('Checked ' + fmt(text.length) + ' characters in ' + (r.ms < 1000 ? r.ms + ' ms' : (r.ms / 1000).toFixed(1) + ' s') + '.');
+}
+
+function verdict(share){
+  if (share < 0.1) return 'Mostly human-style';
+  if (share < 0.4) return 'Mixed: some AI-style passages';
+  if (share < 0.75) return 'Largely AI-style';
+  return 'Strongly AI-style throughout';
+}
+function renderSummary(){
+  const st = R.stats, share = st.scored ? st.aiC / st.scored : 0, mix = st.scored ? st.mixC / st.scored : 0;
+  const hidTotal = R.hidden.counts.reduce((a, b, k) => a + (k === 2 ? 0 : b), 0);
+  const C = 2 * Math.PI * 52, aiLen = share * C, mixLen = mix * C;
+  $('summary').innerHTML =
+    '<div class="ringwrap"><svg class="ring" viewBox="0 0 140 140" aria-hidden="true">' +
+      '<defs><linearGradient id="rg-ai" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff375f"/><stop offset="1" stop-color="#ff8a65"/></linearGradient></defs>' +
+      '<circle cx="70" cy="70" r="52" class="rtrack"/>' +
+      (mixLen > 0.5 ? '<circle cx="70" cy="70" r="52" class="rmix" stroke-dasharray="' + mixLen.toFixed(1) + ' ' + C.toFixed(1) + '" stroke-dashoffset="' + (-aiLen).toFixed(1) + '"/>' : '') +
+      (aiLen > 0.5 ? '<circle cx="70" cy="70" r="52" class="rai" stroke="url(#rg-ai)" stroke-dasharray="' + aiLen.toFixed(1) + ' ' + C.toFixed(1) + '"/>' : '') +
+    '</svg><div class="ringnum"><div class="big">' + Math.round(share * 100) + '<span>%</span></div><div class="ringlab">AI-style</div></div></div>' +
+    '<p class="verdict">' + verdict(share) + '</p>' +
+    '<dl class="kv">' +
+      '<dt>AI-style sentences</dt><dd>' + fmt(st.aiN) + '</dd>' +
+      '<dt>Mixed sentences</dt><dd>' + fmt(st.mixN) + '</dd>' +
+      '<dt>All sentences</dt><dd>' + fmt(st.sentences) + '</dd>' +
+      '<dt>Average sentence score</dt><dd>' + Math.round(st.mean * 100) + '%</dd>' +
+      '<dt>Words</dt><dd>' + fmt(st.words) + '</dd>' +
+      '<dt>Em dashes</dt><dd>' + fmt(st.emdash) + '</dd>' +
+      '<dt>Hidden characters</dt><dd>' + fmt(hidTotal) + '</dd>' +
+    '</dl>' +
+    (st.words < 80 ? '<p class="note">Under 80 words is too short for a reliable reading.</p>' : '');
+}
+function renderTop(){
+  const items = [];
+  R.featAi.forEach((c, k) => { if (c > 0) items.push([c, R.feat[k][1], 'passages']); });
+  R.freqAi.forEach((c, id) => { if (c > 0) items.push([c, R.names[id], 'sentences']); });
+  items.sort((a, b) => b[0] - a[0]);
+  $('top').innerHTML = items.length
+    ? '<p class="note" style="margin:0 0 8px">What pushed AI-style passages over the line.</p><ol class="top">' + items.slice(0, 10).map(x => '<li><span>' + esc(x[1]) + '</span><b>' + fmt(x[0]) + ' ' + x[2] + '</b></li>').join('') + '</ol>'
+    : '<p class="note">No AI-style passages found.</p>';
+}
+function renderHidden(){
+  const h = R.hidden;
+  let html = '<table class="hm"><tbody>';
+  CATS.forEach((c, k) => {
+    const n = h.counts[k];
+    html += '<tr class="' + (n ? '' : 'zero') + '"><td><span class="nm">' + esc(c.name) + '</span><span class="ds">' + esc(c.what) + ' ' + esc(c.why) + '</span>' +
+      (n ? ' <button class="linkbtn" data-pos="' + h.first[k] + '">Show first</button>' : '') + '</td><td class="n">' + fmt(n) + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  if (h.decoded.length){
+    html += '<div class="decoded">' + h.decoded.slice(0, 10).map(d => '<div><b>Hidden message · ' + esc(d.kind) + ' · at character ' + fmt(d.pos) + '</b>' + esc(d.text) + '</div>').join('') + '</div>';
+  }
+  if (h.hgWords.length){
+    html += '<p class="note">Look-alike words: ' + h.hgWords.slice(0, 8).map(w => '<button class="linkbtn" data-pos="' + w.pos + '">' + esc(w.word) + '</button>').join(', ') + '</p>';
+  }
+  const any = h.counts.some(Boolean);
+  html += '<p class="note">' + (any ? 'Hidden characters show the text went through some tool or editor. They don\'t prove an AI wrote it.' : 'No hidden characters found. Missing marks don\'t prove a human wrote it.') + '</p>';
+  $('hidden').innerHTML = html;
+}
+
+function goPage(pg, keepScroll){
+  page = Math.max(0, Math.min(pageStarts.length - 1, pg));
+  const a = pageStarts[page], b = page + 1 < pageStarts.length ? pageStarts[page + 1] : S;
+  const parts = [];
+  for (let i = a; i < b; i++){
+    const lv = level(R.p[i]);
+    const cls = 's' + (lv === 2 ? ' ai' : lv === 1 ? ' mix' : '') + (i === sel ? ' sel' : '');
+    parts.push('<span class="' + cls + '" data-i="' + i + '">' + renderText(text.slice(R.starts[i], endOf(i))) + '</span>');
+  }
+  doc.innerHTML = parts.join('');
+  if (!keepScroll) doc.scrollTop = 0;
+  $('pinfo').textContent = 'Page ' + fmt(page + 1) + ' of ' + fmt(pageStarts.length) + ' · sentences ' + fmt(a + 1) + '–' + fmt(b);
+  $('prev').disabled = page === 0; $('next').disabled = page >= pageStarts.length - 1;
+  drawMap();
+}
+function focusSentence(i){
+  const pg = pageOf(i);
+  sel = i;
+  if (pg !== page) goPage(pg, false);
+  doc.querySelectorAll('.s.sel').forEach(el => el.classList.remove('sel'));
+  const el = doc.querySelector('[data-i="' + i + '"]');
+  if (el){
+    el.classList.add('sel', 'flash');
+    setTimeout(() => el.classList.remove('flash'), 1300);
+    const top = el.offsetTop - doc.offsetTop - doc.clientHeight / 3;
+    doc.scrollTop = Math.max(0, top);
+  }
+  renderDetail(i);
+}
+function wfmt(w){ return '<span class="w ' + (w > 0 ? 'pos' : 'neg') + '">' + (w > 0 ? '+' : '−') + Math.abs(w).toFixed(1) + '</span>'; }
+function renderDetail(i){
+  const pv = R.p[i], lv = level(pv);
+  if (lv < 0){ $('detail').innerHTML = '<p class="note">This is blank space between sentences.</p>'; return; }
+  const chip = lv === 2 ? '<span class="chip ai">AI-style · ' + Math.round(pv * 100) + '%</span>' : lv === 1 ? '<span class="chip mix">Mixed · ' + Math.round(pv * 100) + '%</span>' : '<span class="chip hu">Human-style · ' + Math.round(pv * 100) + '%</span>';
+  const s = text.slice(R.starts[i], endOf(i));
+  const b = R.blockOf[i], NF = R.feat.length;
+  const feats = [];
+  for (let k = 0; k < NF; k++){
+    const c = R.bc[b * NF + k];
+    const label = c > 0 ? R.feat[k][1] : R.feat[k][2];
+    if (Math.abs(c) >= 0.15 && label) feats.push([c, label]);
+  }
+  feats.sort((x, y) => Math.abs(y[0]) - Math.abs(x[0]));
+  const l = R.reasons[i] || [];
+  let own = '';
+  for (let q = 0; q < l.length; q += 2) own += '<li>' + wfmt(l[q + 1] * 0.5) + '<span>' + esc(R.names[l[q]]) + '</span></li>';
+  $('detail').innerHTML =
+    '<div class="dhead">' + chip + '<span>Sentence ' + fmt(i + 1) + '</span></div>' +
+    '<blockquote>' + renderText(s.length > 600 ? s.slice(0, 600) + '…' : s) + '</blockquote>' +
+    '<p class="sub">This passage · ' + Math.round(R.bp[b] * 100) + '% AI-style</p>' +
+    (feats.length ? '<ul class="why">' + feats.slice(0, 8).map(f => '<li>' + wfmt(f[0]) + '<span>' + esc(f[1]) + '</span></li>').join('') + '</ul>' : '<p class="note" style="margin:0">No strong passage signals either way.</p>') +
+    '<p class="sub">This sentence</p>' +
+    (own ? '<ul class="why">' + own + '</ul>' : '<p class="note" style="margin:0">Nothing specific to this sentence. Its score comes from the passage around it.</p>');
+}
+
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function drawMap(){
+  const cv = $('map'); if (!R){ return; }
+  const dpr = window.devicePixelRatio || 1, W = Math.max(1, Math.floor(cv.clientWidth * dpr)), H = Math.max(1, Math.floor(cv.clientHeight * dpr));
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d'), n = text.length || 1;
+  const lv = new Int8Array(W).fill(-1);
+  for (let i = 0; i < S; i++){
+    const l = level(R.p[i]); if (l < 0) continue;
+    const x0 = Math.floor(R.starts[i] / n * W), x1 = Math.max(x0 + 1, Math.floor(endOf(i) / n * W));
+    for (let x = x0; x < x1 && x < W; x++) if (l > lv[x]) lv[x] = l;
+  }
+  ctx.clearRect(0, 0, W, H);
+  const col = ['rgba(255,255,255,0.18)', css('--mix'), css('--ai')];
+  for (let x = 0; x < W; x++){ if (lv[x] < 0) continue; ctx.fillStyle = col[lv[x]]; const h = lv[x] === 2 ? H : lv[x] === 1 ? H * 0.6 : H * 0.25; ctx.fillRect(x, H - h, 1, h); }
+  const a = pageStarts[page], b = page + 1 < pageStarts.length ? pageStarts[page + 1] : S;
+  const px0 = Math.floor(R.starts[a] / n * W), px1 = Math.max(px0 + 2, Math.floor((b < S ? R.starts[b] : n) / n * W));
+  ctx.strokeStyle = css('--accent'); ctx.lineWidth = 2 * dpr; ctx.strokeRect(px0 + dpr, dpr, px1 - px0 - 2 * dpr, H - 2 * dpr);
+}
+
+function buildSample(){
+  const tag = s => Array.from(s).map(ch => String.fromCodePoint(0xE0000 + ch.charCodeAt(0))).join('');
+  return 'Okay so I finally fixed the bike. Took me three evenings, mostly because I kept losing the 10mm wrench, which honestly should be a law of physics by now. The chain was fine. The derailleur was not. idk why the shop quoted me 90 euros for that, it was one bent hanger and a cable.\n\n' +
+    'Regular maintenance is one of the most effective ways to extend the life of a bicycle. A clean, well-lubricated drivetrain reduces wear on the chain and cassette, making each ride smoother and more efficient. Checking tire pressure before every ride also matters, since underinflated tires increase rolling resistance and the risk of pinch flats. These small habits add up over time, ensuring the bike stays reliable and safe in a wide range of conditions.\n\n' +
+    'Brakes deserve the same attention. Worn pads reduce stopping power gradually, which makes the change easy to miss until it becomes a real safety issue. Inspecting them every few weeks, along with the cables and levers, helps riders catch problems early — before they turn into costly repairs. In the end, a consistent routine keeps the bike performing at its best and gives riders greater confidence on every journey.' + tag('model=demo; id=7f3a') + '\n\n' +
+    'Anyway. Next weekend: brakes. Wish me luck lol';
+}
+
+// events
+ta.addEventListener('input', updCount);
+ta.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ e.preventDefault(); run(); } });
+$('run').addEventListener('click', run);
+$('clear').addEventListener('click', () => { ta.value = ''; updCount(); ta.focus(); });
+$('sample').addEventListener('click', () => { ta.value = buildSample(); updCount(); run(); });
+$('file').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  try {
+    let t = await f.text();
+    const cut = t.length > MAX;
+    if (cut) t = t.slice(0, MAX);
+    ta.value = t; updCount();
+    setStatus('Loaded ' + f.name + (cut ? ' (cut to the first 5,000,000 characters)' : '') + '.');
+    run();
+  } catch (err) { setStatus('Could not read ' + f.name + ': ' + err.message, true); }
+  e.target.value = '';
+});
+doc.addEventListener('click', e => { const el = e.target.closest('.s'); if (el && R) focusSentence(+el.dataset.i); });
+$('prev').addEventListener('click', () => R && goPage(page - 1));
+$('next').addEventListener('click', () => R && goPage(page + 1));
+$('nextai').addEventListener('click', () => {
+  if (!R) return;
+  const from = sel >= 0 ? sel + 1 : pageStarts[page];
+  for (let k = 0; k < S; k++){ const i = (from + k) % S; if (R.p[i] >= 0.7){ focusSentence(i); return; } }
+  setStatus('No AI-style passages found.');
+});
+$('map').addEventListener('click', e => {
+  if (!R) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  focusSentence(sIdx(Math.floor((e.clientX - rect.left) / rect.width * text.length)));
+});
+$('map').addEventListener('keydown', e => { if (!R) return; if (e.key === 'ArrowRight') goPage(page + 1); if (e.key === 'ArrowLeft') goPage(page - 1); });
+document.querySelector('aside').addEventListener('click', e => { const b = e.target.closest('[data-pos]'); if (b && R) focusSentence(sIdx(+b.dataset.pos)); });
+$('copyclean').addEventListener('click', () => {
+  const src = R ? text : ta.value; if (!src){ setStatus('Nothing to clean yet.', true); return; }
+  const c = clean(src), removed = src.length - c.length;
+  const done = () => setStatus('Copied cleaned text. ' + fmt(removed) + ' hidden characters removed; special spaces and look-alike letters replaced.');
+  const fallback = () => { ta.value = c; updCount(); ta.select(); setStatus('Copying was blocked. The cleaned text is now in the box and selected; press Ctrl+C.'); };
+  try { navigator.clipboard.writeText(c).then(done, fallback); } catch (err) { fallback(); }
+});
+$('useclean').addEventListener('click', () => { const src = R ? text : ta.value; if (!src) return; ta.value = clean(src); updCount(); run(); });
+let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(drawMap, 120); });
+
+ta.value = buildSample(); updCount();
+run();
+})();
+</script>
+
+</body>
+</html>
