@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Textprint</title>
-<meta name="description" content="Free, private AI text checker. Sentence-by-sentence AI-style scoring with reasons, plus a scan for hidden characters and invisible messages. Up to 5,000,000 characters, all in your browser.">
+<meta name="description" content="Free, private AI text checker. Sentence-by-sentence AI-style scoring with reasons, plus a scan for hidden characters and invisible messages. Works in English, German and Dutch. Up to 5,000,000 characters, all in your browser.">
 <meta name="theme-color" content="#0a0a0c">
 <meta property="og:title" content="Textprint">
 <meta property="og:description" content="Know what wrote it. Free, private AI text checker that shows its reasons.">
@@ -12,7 +12,8 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230a0a0c'/%3E%3Cg fill='none' stroke='%23e5e5ea' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M12 3.5a8.5 8.5 0 0 0-8.5 8.5'/%3E%3Cpath d='M12 3.5a8.5 8.5 0 0 1 8.5 8.5v1.5'/%3E%3Cpath d='M12 7a5 5 0 0 0-5 5v2.5'/%3E%3Cpath d='M12 7a5 5 0 0 1 5 5v4'/%3E%3Cpath d='M12 10.5a1.5 1.5 0 0 0-1.5 1.5v5.5'/%3E%3Cpath d='M13.5 12v8'/%3E%3C/g%3E%3C/svg%3E">
 <style>html{color-scheme:dark}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
-<body><style>
+<body>
+<style>
 /* Layout: one dark graphite stage, quiet silver type, generous air. Document left, readings right. Deliberately dark-only. */
 :root{
   color-scheme:dark;
@@ -167,6 +168,12 @@ details.how b{color:var(--ink);font-weight:600}
 #summary .verdict{text-align:center;margin:14px 0 6px}
 footer.fine{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
 footer.fine p{margin:0;font-size:12px;line-height:1.5;color:var(--faint);max-width:none}
+.gright{display:flex;align-items:center;gap:22px}
+.langsw{display:inline-flex;padding:2px;border-radius:980px;background:rgba(255,255,255,.08)}
+.langsw button{font-size:11px;font-weight:600;letter-spacing:.02em;padding:4px 9px;border-radius:980px;background:transparent;color:#a1a1a6}
+.langsw button:hover{background:rgba(255,255,255,.1);color:#fff}
+.langsw button[aria-pressed="true"]{background:linear-gradient(180deg,#f5f5f7,#c7c7cc);color:#0a0a0c}
+@media (max-width:620px){.gright{gap:12px}.glinks{display:none}}
 .progress{margin-top:20px}
 .ptrack{position:relative;height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
 .ptrack i{position:absolute;inset:0;transform-origin:left center;transform:scaleX(0);border-radius:3px;
@@ -184,36 +191,43 @@ body.busy .doc,body.busy #summary{opacity:.35;transition:opacity .2s}
 <nav class="gnav" aria-label="Sections">
   <div class="gnav-in">
     <a class="gbrand" href="#check"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 3.5a8.5 8.5 0 0 0-8.5 8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 8.5 8.5v1.5"/><path d="M12 7a5 5 0 0 0-5 5v2.5"/><path d="M12 7a5 5 0 0 1 5 5v4"/><path d="M12 10.5a1.5 1.5 0 0 0-1.5 1.5v5.5"/><path d="M13.5 12v8"/></g></svg>Textprint</a>
-    <div class="glinks"><a href="#check">Check</a><a href="#document">Document</a><a href="#marks">Hidden marks</a><a href="#how">How it works</a></div>
+    <div class="gright">
+      <div class="glinks"><a href="#check" data-i18n="navCheck">Check</a><a href="#document" data-i18n="navDoc">Document</a><a href="#marks" data-i18n="navMarks">Hidden marks</a><a href="#how" data-i18n="navHow">How it works</a></div>
+      <div class="langsw" role="group" aria-label="Language">
+        <button type="button" data-lang="en" aria-pressed="true" title="English">EN</button>
+        <button type="button" data-lang="de" aria-pressed="false" title="Deutsch">DE</button>
+        <button type="button" data-lang="nl" aria-pressed="false" title="Nederlands">NL</button>
+      </div>
+    </div>
   </div>
 </nav>
 <div class="wrap">
   <header class="top">
-    <p class="kicker">Free. Private. Up to 5,000,000 characters.</p>
-    <h1 class="brand">Know what wrote it.</h1>
-    <p class="lede">Textprint reads your text the way a detective reads a fingerprint: passage by passage, with every clue shown. It runs entirely in your browser, so nothing is uploaded.</p>
-    <div class="legend" aria-label="Legend">
-      <span><i class="sw ai"></i>AI-style</span>
-      <span><i class="sw mix"></i>Mixed</span>
-      <span><i class="sw hu"></i>Human-style</span>
-      <span><span class="hid">ZWSP</span>Hidden character</span>
+    <p class="kicker" data-i18n="kicker">Free. Private. Up to 5,000,000 characters.</p>
+    <h1 class="brand" data-i18n="headline">Know what wrote it.</h1>
+    <p class="lede" data-i18n="lede">Textprint reads your text the way a detective reads a fingerprint: passage by passage, with every clue shown. It runs entirely in your browser, so nothing is uploaded.</p>
+    <div class="legend" data-i18n-aria="legend" aria-label="Legend">
+      <span><i class="sw ai"></i><span data-i18n="lgAi">AI-style</span></span>
+      <span><i class="sw mix"></i><span data-i18n="lgMix">Mixed</span></span>
+      <span><i class="sw hu"></i><span data-i18n="lgHu">Human-style</span></span>
+      <span><span class="hid">ZWSP</span><span data-i18n="lgHid">Hidden character</span></span>
     </div>
   </header>
 
   <div class="grid">
     <main class="col">
       <section class="panel" aria-labelledby="in-h" id="check">
-        <h2 class="ptitle" id="in-h">Paste. Analyze. See why.</h2>
-        <textarea id="input" maxlength="5000000" spellcheck="false" aria-label="Text to analyze"></textarea>
+        <h2 class="ptitle" id="in-h" data-i18n="checkTitle">Paste. Analyze. See why.</h2>
+        <textarea id="input" maxlength="5000000" spellcheck="false" data-i18n-aria="inputAria" aria-label="Text to analyze"></textarea>
         <div class="row">
-          <button class="primary" id="run">Analyze</button>
-          <label class="filebtn">Upload .txt / .md<input type="file" id="file" accept=".txt,.md,.csv,.html,.htm,.json,.srt,.log,text/*"></label>
-          <button id="sample">Load sample</button>
-          <button id="clear">Clear</button>
+          <button class="primary" id="run" data-i18n="analyze">Analyze</button>
+          <label class="filebtn"><span data-i18n="upload">Upload .txt / .md</span><input type="file" id="file" accept=".txt,.md,.csv,.html,.htm,.json,.srt,.log,text/*"></label>
+          <button id="sample" data-i18n="sample">Load sample</button>
+          <button id="clear" data-i18n="clear">Clear</button>
           <span class="spacer"></span>
           <span class="count" id="count">0 / 5,000,000 characters</span>
         </div>
-        <div class="progress" id="prog" role="progressbar" aria-label="Analysis progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden>
+        <div class="progress" id="prog" role="progressbar" data-i18n-aria="progAria" aria-label="Analysis progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden>
           <div class="ptrack"><i id="progfill"></i></div>
           <div class="pmeta"><span id="proglab">Reading the text…</span><span id="progpct">0%</span></div>
         </div>
@@ -221,15 +235,15 @@ body.busy .doc,body.busy #summary{opacity:.35;transition:opacity .2s}
       </section>
 
       <section class="panel" aria-labelledby="doc-h" id="document">
-        <h2 class="ptitle" id="doc-h">Every sentence, marked.</h2>
+        <h2 class="ptitle" id="doc-h" data-i18n="docTitle">Every sentence, marked.</h2>
         <div class="mapwrap">
-          <canvas id="map" tabindex="0" aria-label="Overview of the whole text. Red marks are AI-style passages. Click to jump."></canvas>
-          <div class="maplab"><span>start</span><span id="maplen"></span><span>end</span></div>
+          <canvas id="map" tabindex="0" data-i18n-aria="mapAria" aria-label="Overview of the whole text. Red marks are AI-style passages. Click to jump."></canvas>
+          <div class="maplab"><span data-i18n="start">start</span><span id="maplen"></span><span data-i18n="end">end</span></div>
         </div>
         <div class="pager">
-          <button id="prev" aria-label="Previous page">◂ Prev</button>
-          <button id="next" aria-label="Next page">Next ▸</button>
-          <button id="nextai">Next AI-style passage</button>
+          <button id="prev" data-i18n="prev" data-i18n-aria="prevAria" aria-label="Previous page">◂ Prev</button>
+          <button id="next" data-i18n="next" data-i18n-aria="nextAria" aria-label="Next page">Next ▸</button>
+          <button id="nextai" data-i18n="nextAi">Next AI-style passage</button>
           <span class="spacer"></span>
           <span class="pinfo" id="pinfo"></span>
         </div>
@@ -238,9 +252,11 @@ body.busy .doc,body.busy #summary{opacity:.35;transition:opacity .2s}
 
       <section class="panel">
         <details class="how" id="how">
-          <summary>How this works, and what it can't do</summary>
+          <summary data-i18n="howTitle">How this works, and what it can't do</summary>
+          <div data-i18n-html="howBody">
           <p>The text is split into passages of about 100 words. Each passage is measured as a whole, the way detectors like ZeroGPT work, because clean AI writing rarely gives itself away in a single sentence. Each sentence then gets its passage's score, adjusted by anything specific to that sentence.</p>
           <ul>
+            <li><b>Languages:</b> English, German and Dutch are recognised automatically, each with its own word lists and phrase patterns. Other languages get only the language-neutral checks.</li>
             <li><b>Style statistics:</b> how evenly sentence lengths run, average word length, how many abstract nouns (-tion, -ment, -ity), trailing "-ing" clauses (", ensuring…"), and how polished the punctuation is.</li>
             <li><b>Specifics:</b> human writing tends to carry names, places, numbers, a personal "I", asides in parentheses and exclamation marks. Generic text without them leans AI.</li>
             <li><b>Wording:</b> words and stock phrases that language models overuse ("enhance", "crucial", "delve", "a testament to", "it's important to note").</li>
@@ -251,37 +267,38 @@ body.busy .doc,body.busy #summary{opacity:.35;transition:opacity .2s}
           </ul>
           <p><b>No detector is 100% accurate, this one included.</b> Formal human writing (legal, academic, corporate) can score high. AI text that someone edited or rewrote can score low. Claude and GPT don't put a detectable watermark in their text, so no tool can prove who wrote something. Hidden characters prove the text passed through some tool or editor, not that an AI wrote it. Use the score as a reason to look closer, never as proof against a person.</p>
           <p>It doesn't name the model (Claude, GPT, Gemini). Their styles overlap too much to tell apart reliably.</p>
+          </div>
         </details>
       </section>
     </main>
 
     <aside class="col">
       <section class="panel" aria-labelledby="sum-h">
-        <p class="eyebrow" id="sum-h">Reading</p>
-        <div id="summary"><p class="note">Run an analysis to see the score.</p></div>
-        <p class="honest">These are AI-style signals, not proof. See "How this works" below the document.</p>
+        <p class="eyebrow" id="sum-h" data-i18n="reading">Reading</p>
+        <div id="summary"><p class="note" data-i18n="runFirst">Run an analysis to see the score.</p></div>
+        <p class="honest" data-i18n="honest">These are AI-style signals, not proof. See "How this works" below the document.</p>
       </section>
       <section class="panel" aria-labelledby="det-h">
-        <p class="eyebrow" id="det-h">Why this sentence</p>
-        <div id="detail"><p class="note">Click any sentence in the document to see what raised or lowered its score.</p></div>
+        <p class="eyebrow" id="det-h" data-i18n="whyTitle">Why this sentence</p>
+        <div id="detail"><p class="note" data-i18n="clickHint">Click any sentence in the document to see what raised or lowered its score.</p></div>
       </section>
       <section class="panel" aria-labelledby="top-h">
-        <p class="eyebrow" id="top-h">Most frequent signals</p>
-        <div id="top"><p class="note">Nothing yet.</p></div>
+        <p class="eyebrow" id="top-h" data-i18n="topTitle">Most frequent signals</p>
+        <div id="top"><p class="note" data-i18n="nothingYet">Nothing yet.</p></div>
       </section>
       <section class="panel" aria-labelledby="hid-h" id="marks">
-        <p class="eyebrow" id="hid-h">Hidden marks</p>
-        <div id="hidden"><p class="note">Nothing yet.</p></div>
+        <p class="eyebrow" id="hid-h" data-i18n="marksTitle">Hidden marks</p>
+        <div id="hidden"><p class="note" data-i18n="nothingYet">Nothing yet.</p></div>
         <div class="row">
-          <button id="copyclean">Copy cleaned text</button>
-          <button id="useclean">Clean and re-check</button>
+          <button id="copyclean" data-i18n="copyClean">Copy cleaned text</button>
+          <button id="useclean" data-i18n="useClean">Clean and re-check</button>
         </div>
       </section>
     </aside>
   </div>
   <footer class="fine">
-    <p>Textprint estimates how AI-like a text reads from its style and wording. No detector, including this one, is 100% accurate: formal human writing can score high and edited AI text can score low. Claude and GPT do not embed a detectable watermark, so a score is never proof of who wrote something. Please don't use it as the only basis for decisions about a person.</p>
-    <p>Your text never leaves this browser tab. Hidden-character results show that text passed through some tool or editor, not that an AI wrote it.</p>
+    <p data-i18n="fine1">Textprint estimates how AI-like a text reads from its style and wording. No detector, including this one, is 100% accurate: formal human writing can score high and edited AI text can score low. Claude and GPT do not embed a detectable watermark, so a score is never proof of who wrote something. Please don't use it as the only basis for decisions about a person.</p>
+    <p data-i18n="fine2">Your text never leaves this browser tab. Hidden-character results show that text passed through some tool or editor, not that an AI wrote it.</p>
   </footer>
 </div>
 
@@ -327,6 +344,7 @@ const RULES = [
   R(/\b(?:easier|faster|simpler|smarter|more efficient) and (?:faster|easier|simpler|smarter|more efficient|more convenient|more accessible)\b/i, 0.9, 'Paired comparatives ("easier and faster")'),
   R(/\b(?:use (?:it|them|ai|technology|these tools) (?:responsibly|wisely|ethically))\b|\bresponsible (?:use|development|innovation)\b/i, 1.3, 'Stock closer: "use it responsibly"'),
   R(/\b(?:our|people'?s) (?:daily |everyday )?lives\b/i, 0.7, 'Generic "our lives"'),
+  R(/\b(?:thank you for taking the time|(?:i|we) look forward to hearing|please don'?t hesitate to (?:reach out|contact)|i hope this (?:email|message) finds you)\b/i, 0.8, 'Template email phrasing'),
   R(/\bless about [^.!?]{1,60}\bmore about\b|\bnot about [^.!?]{1,60}, but about\b/i, 1.4, 'Template: "less about X, more about Y"'),
   R(/\b(?:looking back|i used to think|i used to believe|things changed when|the lesson i (?:took away|learned)|what i(?:'ve)? learned|here'?s what i learned|that'?s when i realized|it taught me)\b/i, 1.2, 'Reflective template ("Looking back…", "I used to think…")'),
   R(/\*\*[^*\n]{2,80}\*\*/, 1.2, 'Markdown bold (**text**)'),
@@ -357,6 +375,88 @@ const ING = /,\s+(?:ensuring|making|allowing|highlighting|creating|providing|off
 const NOM = /(?:tion|sion|ment|ity|ness|ance|ence|ism)s?$/;
 const COMMON_ACR = new Set(['AI', 'US', 'USA', 'UK', 'EU', 'UN', 'CEO', 'IT', 'TV', 'OK', 'AM', 'PM', 'ID', 'PC', 'FAQ', 'HR', 'PR', 'ML', 'LLM', 'LLMs', 'API', 'APIs', 'GPT', 'UI', 'UX', 'IoT', 'VR', 'AR', 'STEM', 'NGO', 'NGOs', 'SEO', 'ROI', 'KPI', 'KPIs', 'B2B', 'SaaS']);
 const FP = new Set(['i', 'me', 'my', 'mine', 'myself', "i'm", "i've", "i'd", "i'll"]);
+
+// ---------- German and Dutch ----------
+// formatting and punctuation rules work in every language
+const SHARED_NAMES = new Set(['Markdown bold (**text**)', 'Markdown heading (# …)', 'Bullet with bold lead-in', 'Emoji used as bullet or heading', 'Repeated punctuation (human-like)', 'List of three ("A, B, and C")']);
+const SHARED = RULES.filter(r => SHARED_NAMES.has(REASONS[r.id]));
+const DE_RULES = SHARED.filter(r => REASONS[r.id] !== 'List of three ("A, B, and C")').concat([
+  R(/\bals (?:eine )?(?:ki|künstliche intelligenz|sprachmodell)\b/i, 4, 'Chatbot self-reference ("as an AI…")'),
+  R(/\bich hoffe,? (?:das|dies|diese (?:informationen|erklärung)) (?:hilft|hat geholfen|war hilfreich)\b/i, 2.4, 'Assistant sign-off ("I hope this helps")'),
+  R(/^\s*(?:gerne|natürlich|selbstverständlich|absolut|klar)[!,.]/i, 1.6, 'Assistant-style opener ("Certainly!")'),
+  R(/\b(?:lass|lassen sie) (?:mich|es mich) wissen,? (?:ob|wenn|falls)\b/i, 1.8, 'Assistant-style offer ("Let me know if…")'),
+  R(/\bhier (?:ist|sind) (?:eine|ein|die|einige) (?:übersicht|zusammenfassung|überarbeitete|kurze|schritt)/i, 1.8, 'Assistant framing ("Here\'s a breakdown")'),
+  R(/\bes ist (?:wichtig|entscheidend|wesentlich|unerlässlich),? (?:zu beachten|anzumerken|zu betonen|zu berücksichtigen)\b/i, 1.6, 'Stock hedge ("It\'s important to note")'),
+  R(/\bes ist (?:wichtig|entscheidend|wesentlich|unerlässlich|notwendig),\s/i, 1.1, 'Stock hedge ("It is important to…")'),
+  R(/\bin der heutigen (?:schnelllebigen|digitalen|modernen|vernetzten|sich (?:schnell )?(?:wandelnden|verändernden))\b/i, 2, 'Stock opener: "In today\'s fast-paced…"'),
+  R(/\bspielt eine (?:entscheidende|zentrale|wichtige|wesentliche|maßgebliche|bedeutende) rolle\b/i, 1.4, 'Stock phrase: "plays a crucial role"'),
+  R(/\b(?:ist|sind|wird|wurde) (?:zu )?(?:einem|ein) (?:wichtigen|wichtiger|festen|unverzichtbaren|unverzichtbarer|wesentlichen|wesentlicher|integralen) (?:bestandteil|teil) (?:unseres|unserer|des)\b/i, 1.6, 'Stock phrase: "has become an important part of"'),
+  R(/\b(?:verändert|revolutioniert|prägt) (?:die welt|unsere welt|die art und weise|wie wir)\b/i, 1.3, 'Stock phrase: "changing the world"'),
+  R(/\b(?:verantwortungsvoll|verantwortungsbewusst) (?:zu )?(?:nutzen|einsetzen|umgehen)\b|\bverantwortungsvolle(?:n)? (?:nutzung|umgang|einsatz)\b/i, 1.3, 'Stock closer: "use it responsibly"'),
+  R(/^\s*(?:zusammenfassend|abschließend|insgesamt|letztendlich|alles in allem)\b/i, 1.1, 'Essay-template wrap-up'),
+  R(/^\s*(?:darüber hinaus|zudem|des weiteren|ferner|außerdem)\b/i, 0.8, 'Formal transition at sentence start'),
+  R(/\b(?:ob (?:sie|du) (?:nun )?(?:ein(?:e)? )?[^.!?]{1,40}? oder)\b|\bob anfänger oder profi\b/i, 1.5, 'Template: "Whether you\'re a… or a…"'),
+  R(/\bwährend (?:es|sie|dies|ki) (?:viele|zahlreiche|enorme|große)? ?(?:vorteile|chancen|möglichkeiten) (?:bietet|bieten|mit sich bringt)\b|\bbietet (?:viele|zahlreiche) vorteile\b/i, 1.5, 'Balanced-take template ("While it offers many benefits…")'),
+  R(/\b(?:sich ständig|stetig) (?:weiterentwickelnde|wandelnde|verändernde)n? (?:landschaft|welt)\b/i, 1.6, 'Stock phrase: "ever-evolving landscape"'),
+  R(/\b(?:potenzial|potential) (?:voll )?(?:entfalten|ausschöpfen|freisetzen|nutzen)\b/i, 1.4, 'Stock phrase: "unlock the potential"'),
+  R(/\bnicht nur [^.!?]{1,80}, sondern auch\b/i, 0.6, 'Contrast template: "not just X, but Y"'),
+  R(/\b(?:einfacher|schneller|effizienter|bequemer) und (?:schneller|einfacher|effizienter|bequemer)\b/i, 0.9, 'Paired comparatives ("easier and faster")'),
+  R(/\b(?:unseres|unserem|unser) (?:täglichen |alltäglichen )?(?:leben|lebens|alltag|alltags)\b/i, 0.7, 'Generic "our lives"'),
+  R(/\b(?:vielen dank für (?:das|ihr|ihre|den) (?:angenehme|freundliche|interessante|konstruktive)|ich freue mich auf ihre (?:rückmeldung|antwort)|bei fragen stehe ich ihnen (?:jederzeit )?(?:gerne )?zur verfügung|zögern sie nicht)/i, 0.8, 'Template email phrasing'),
+  R(/\b(?:lol|haha|hahaha|xd|digga|krass|nö|ne\?|oder so|irgendwie|halt|bissl|bisschen|eigentlich egal)\b/i, -1.4, 'Casual slang (human-like)'),
+]);
+const NL_RULES = SHARED.filter(r => REASONS[r.id] !== 'List of three ("A, B, and C")').concat([
+  R(/\bals (?:een )?(?:ai|ki|kunstmatige intelligentie|taalmodel)\b/i, 4, 'Chatbot self-reference ("as an AI…")'),
+  R(/\bik hoop dat (?:dit|deze informatie|deze uitleg) (?:helpt|je helpt|nuttig is)\b/i, 2.4, 'Assistant sign-off ("I hope this helps")'),
+  R(/^\s*(?:natuurlijk|zeker|absoluut|graag gedaan)[!,.]/i, 1.6, 'Assistant-style opener ("Certainly!")'),
+  R(/\blaat (?:het )?(?:me|mij) (?:gerust )?weten,? (?:als|of)\b/i, 1.8, 'Assistant-style offer ("Let me know if…")'),
+  R(/\bhier (?:is|zijn) (?:een|het|de|enkele) (?:overzicht|samenvatting|herziene|korte|stap)/i, 1.8, 'Assistant framing ("Here\'s a breakdown")'),
+  R(/\bhet is (?:belangrijk|essentieel|cruciaal) om (?:op te merken|te benadrukken|te onthouden|rekening te houden)\b/i, 1.6, 'Stock hedge ("It\'s important to note")'),
+  R(/\bhet is (?:belangrijk|essentieel|cruciaal|noodzakelijk|van belang) (?:om|dat)\b/i, 1.1, 'Stock hedge ("It is important to…")'),
+  R(/\bin (?:de|het) (?:snel veranderende|snelle|digitale|moderne|huidige) (?:wereld|tijdperk|samenleving) (?:van vandaag)?\b|\bin de wereld van vandaag\b/i, 2, 'Stock opener: "In today\'s fast-paced…"'),
+  R(/\bspeelt een (?:cruciale|belangrijke|essentiële|centrale|sleutel|grote) ?rol\b/i, 1.4, 'Stock phrase: "plays a crucial role"'),
+  R(/\b(?:is|zijn|wordt) (?:een )?(?:belangrijk|essentieel|onmisbaar|vast|integraal) (?:onderdeel|deel) (?:geworden )?van (?:ons|onze|het)\b/i, 1.6, 'Stock phrase: "has become an important part of"'),
+  R(/\b(?:verandert|verander[dt]|revolutioneert|transformeert) (?:de wereld|onze wereld|de manier waarop|hoe we)\b/i, 1.3, 'Stock phrase: "changing the world"'),
+  R(/\bverantwoord(?:elijk)? (?:te )?(?:gebruiken|inzetten|omgaan)\b|\bverantwoord gebruik\b/i, 1.3, 'Stock closer: "use it responsibly"'),
+  R(/^\s*(?:kortom|samenvattend|tot slot|al met al|uiteindelijk|concluderend)\b/i, 1.1, 'Essay-template wrap-up'),
+  R(/^\s*(?:daarnaast|bovendien|verder|tevens|ook)\b,?/i, 0.8, 'Formal transition at sentence start'),
+  R(/\bof je nu (?:een )?[^.!?]{1,40}? bent of\b/i, 1.5, 'Template: "Whether you\'re a… or a…"'),
+  R(/\bhoewel (?:het|dit|ai|ze) (?:veel|talloze|vele|grote)? ?(?:voordelen|kansen|mogelijkheden) (?:biedt|bieden|met zich meebrengt)\b|\bbiedt (?:veel|talloze) voordelen\b/i, 1.5, 'Balanced-take template ("While it offers many benefits…")'),
+  R(/\b(?:steeds|voortdurend) (?:veranderende|evoluerende) (?:landschap|wereld)\b/i, 1.6, 'Stock phrase: "ever-evolving landscape"'),
+  R(/\b(?:potentieel|potentie) (?:volledig )?(?:benutten|ontsluiten|waarmaken)\b/i, 1.4, 'Stock phrase: "unlock the potential"'),
+  R(/\bniet alleen [^.!?]{1,80}, maar ook\b/i, 0.6, 'Contrast template: "not just X, but Y"'),
+  R(/\b(?:makkelijker|eenvoudiger|sneller|efficiënter) en (?:sneller|makkelijker|eenvoudiger|efficiënter)\b/i, 0.9, 'Paired comparatives ("easier and faster")'),
+  R(/\b(?:ons|onze) (?:dagelijks(?:e)? )?(?:leven|levens)\b/i, 0.7, 'Generic "our lives"'),
+  R(/\b(?:hartelijk dank voor (?:het|je|jullie|uw) (?:prettige|fijne|goede)|we kijken (?:ernaar )?uit naar (?:je|uw) reactie|aarzel niet om|laat (?:het )?ons (?:gerust )?weten)/i, 0.8, 'Template email phrasing'),
+  R(/\b(?:lol|haha|hahaha|xd|ff|gwn|idd|mss|joh|nou ja|zeg maar|ofzo|toch\?)\b/i, -1.4, 'Casual slang (human-like)'),
+]);
+const LEX_DE = Object.create(null), LEX_NL = Object.create(null);
+function LL(map, w, words){ for (const x of words.split(/\s+/)) if (x && !(x in map)) map[x] = w; }
+LL(LEX_DE, 1.4, "eintauchen ganzheitlich ganzheitliche ganzheitlichen nahtlos nahtlose nahtlosen facettenreich facettenreiche vielschichtig vielschichtige maßgeschneidert maßgeschneiderte bahnbrechend bahnbrechende unverzichtbar unverzichtbare zweifellos essenziell essenzielle wegweisend wegweisende transformative");
+LL(LEX_DE, 0.8, "entscheidend entscheidende entscheidenden wesentlich wesentliche wesentlichen fördern fördert fördert förderung ermöglichen ermöglicht ermöglichte innovativ innovative innovativen effizient effiziente effizienten nachhaltig nachhaltige nachhaltigen optimieren optimiert vielzahl zahlreiche zahlreichen maßgeblich maßgebliche bedeutung bedeutende bedeutenden herausforderungen chancen potenzial potenziale vorteile landschaft reise erkenntnisse wertvoll wertvolle wertvollen gewährleisten gewährleistet sicherstellen stellt verbessern verbessert verbesserung steigern steigert dynamisch dynamische umfassend umfassende umfassenden gezielt gezielte gezielten mehrwert vereinfachen vereinfacht erheblich erhebliche zentrale zentralen reibungslos reibungslose anregungen");
+LL(LEX_DE, 0.4, "verschiedene verschiedenen vielfältig vielfältige insgesamt insbesondere letztendlich zudem darüber hinaus somit dabei aspekte aspekten bereich bereichen möglichkeiten individuell individuelle wichtig wichtige wichtigen beitragen beiträgt");
+LL(LEX_NL, 1.4, "naadloos naadloze holistisch holistische veelzijdig veelzijdige veelzijdigheid baanbrekend baanbrekende onmisbaar onmisbare ongetwijfeld essentieel essentiële transformatief transformatieve maatwerk duiken");
+LL(LEX_NL, 0.8, "cruciaal cruciale bevorderen bevordert mogelijk innovatief innovatieve efficiënt efficiënte duurzaam duurzame optimaliseren optimaliseert stroomlijnen talloze waardevol waardevolle inzichten uitdagingen kansen potentieel voordelen landschap reis waarborgen garanderen verbeteren verbetert verbetering versterken versterkt dynamisch dynamische aanzienlijk aanzienlijke");
+LL(LEX_NL, 0.4, "diverse verschillende divers gevarieerd uiteindelijk bovendien daarnaast tevens aspecten gebied gebieden mogelijkheden individueel individuele belangrijk belangrijke bijdragen draagt effectief effectieve");
+// how each language behaves: average word length and abstract-noun rate differ; German capitalises every noun
+const LANG = {
+  en: { rules: RULES, lex: LEX, ing: ING, nom: NOM, nomBase: 3, awl: 4.55, fp: FP, thisRe: /^\s*(?:This|These)\b/, pn: true, spec: true },
+  de: { rules: DE_RULES, lex: LEX_DE, ing: /,\s+(?:wodurch|was (?:wiederum )?(?:dazu führt|ermöglicht|sicherstellt|gewährleistet)|wobei)\b/gi, nom: /(?:ung|heit|keit|schaft|tion|tät|ismus)(?:en)?$/, nomBase: 6, awl: 5.75, fp: new Set(['ich', 'mich', 'mir', 'mein', 'meine', 'meinen', 'meinem', 'meiner']), thisRe: /^\s*(?:Dies|Diese|Dieser|Dieses)\b/, pn: false, spec: false },
+  nl: { rules: NL_RULES, lex: LEX_NL, ing: /,\s+(?:waardoor|wat (?:ervoor zorgt|zorgt voor|bijdraagt|leidt tot))\b/gi, nom: /(?:ing|heid|tie|teit|schap|isme)(?:en|s)?$/, nomBase: 4.5, awl: 5.05, fp: new Set(['ik', 'mij', 'me', 'mijn', "m'n"]), thisRe: /^\s*(?:Dit|Deze)\b/, pn: true, spec: false },
+};
+const STOP = {
+  en: new Set('the and is of to in that it with for was this are you not be have on'.split(' ')),
+  de: new Set('der die und ist nicht das ich mit zu den ein eine auch sich dass von wir es auf'.split(' ')),
+  nl: new Set('het en een van is niet dat ik met op voor zijn ook je wat er maar ze'.split(' ')),
+};
+function detectLang(text){
+  const sample = text.slice(0, 200000).toLowerCase().match(/[a-zäöüßéëïèà]+/g) || [];
+  const sc = { en: 0, de: 0, nl: 0 };
+  for (const w of sample) for (const l in STOP) if (STOP[l].has(w)) sc[l]++;
+  let best = 'en';
+  for (const l in sc) if (sc[l] > sc[best]) best = l;
+  return best;
+}
 
 // passage-level features: [key, label when it pushes toward AI, label when it pushes toward human]
 const FEAT = [
@@ -398,7 +498,7 @@ function segment(text){
   }
   const re = /[.!?…]+["'”’)\]]*(?=\s)|\n/g;
   let m;
-  const ABBR = /(?:\b(?:e\.g|i\.e|etc|vs|Mr|Mrs|Ms|Dr|St|Jr|Sr|Prof|Inc|Ltd|Co|No|Fig|approx|cf|al)|(?:^|\s)[A-Z])\.$/;
+  const ABBR = /(?:\b(?:e\.g|i\.e|etc|vs|Mr|Mrs|Ms|Dr|St|Jr|Sr|Prof|Inc|Ltd|Co|No|Fig|approx|cf|al|z\.B|d\.h|bzw|usw|ca|evtl|vgl|Nr|bijv|o\.a|d\.w\.z|enz|m\.a\.w|dhr|mevr)|(?:^|\s)[A-Z])\.$/;
   while ((m = re.exec(text))){
     if (m[0] === '.' && ABBR.test(text.slice(Math.max(0, m.index - 8), m.index + 1))) continue;
     let end = m.index + m[0].length;
@@ -422,64 +522,70 @@ function analyze(text, progress){
   const S = starts.length;
   const endOf = i => (i + 1 < S ? starts[i + 1] : n);
   const sIdx = pos => { let lo = 0, hi = S - 1; while (lo < hi){ const mid = (lo + hi + 1) >> 1; if (starts[mid] <= pos) lo = mid; else hi = mid - 1; } return lo; };
+  const lang = detectLang(text), cfg = LANG[lang];
+  const RULESL = cfg.rules, LEXL = cfg.lex, INGL = cfg.ing, NOML = cfg.nom, FPL = cfg.fp;
 
   // per-sentence measurements
-  const K = 23; // stats per sentence (17 quotes, 18 questions, 19 very short, 20 words counted for length, 21 long words, 22 specialist long words)
+  const K = 24; // stats per sentence (17 quotes, 18 questions, 19 very short, 20 words counted for length, 21 long words, 22 specialist long words, 23 words counted for rhythm)
   const st = new Float32Array(S * K);
   // 0 words,1 lex,2 ing,3 letters,4 nom,5 fp,6 excl,7 digits,8 pn,9 paren,10 thisStart,11 dash,12 rulePos,13 ruleNeg,14 latin,15 sloppy,16 paraEnd
   const rsum = new Float32Array(S);
   const reasons = new Array(S).fill(null);
-  let words = 0, emdash = 0;
+  let words = 0, emdash = 0, prevComma = false;
   for (let i = 0; i < S; i++){
     const s = text.slice(starts[i], endOf(i));
     const all = s.match(/\S+/g);
     const wAll = all ? all.length : 0;
     if (!wAll) continue;
     words += wAll;
-    const toks = s.match(/[A-Za-z][A-Za-z'’-]*/g) || [];
+    const toks = s.match(/[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ'’-]*/g) || [];
     const o = i * K;
     let lex = 0, letters = 0, nom = 0, fp = 0, pn = 0, acr = 0, lenW = 0, longW = 0, rareW = 0;
     for (let k = 0; k < toks.length; k++){
       const t = toks[k];
       const lw = t.toLowerCase().replace(/’/g, "'");
-      const lx = LEX[lw]; if (lx) lex += lx;
+      const lx = LEXL[lw]; if (lx) lex += lx;
       let rare = false;
-      if (t.length >= 8 && !(k > 0 && t[0] >= 'A' && t[0] <= 'Z')){
+      if (cfg.spec && t.length >= 8 && !(k > 0 && t[0] >= 'A' && t[0] <= 'Z')){
         longW++;
         if (!lx && !GEN.has(lw.slice(0, 6))){ rare = true; rareW++; }
       }
-      if (!rare){ letters += Math.min(t.length, 10); lenW++; }
+      if (!rare){ letters += Math.min(t.length, lang === 'de' ? 12 : 10); lenW++; }
       if (t.length >= 2 && t.length <= 7 && /^[A-Z][A-Za-z]*[A-Z][A-Za-z]*$/.test(t) && !COMMON_ACR.has(t)) acr++;
-      if (t.length >= 7 && NOM.test(lw)) nom++;
-      if (FP.has(lw)) fp++;
+      if (t.length >= 7 && NOML.test(lw)) nom++;
+      if (FPL.has(lw)) fp++;
       if (k > 0 && t.length > 1 && t[0] >= 'A' && t[0] <= 'Z' && t[1] >= 'a' && t[1] <= 'z' && !/^I'/.test(t)) pn++;
     }
     st[o] = toks.length; st[o + 1] = lex; st[o + 3] = letters; st[o + 4] = nom; st[o + 5] = fp; st[o + 8] = pn;
-    ING.lastIndex = 0; st[o + 2] = (s.match(ING) || []).length;
+    INGL.lastIndex = 0; st[o + 2] = (s.match(INGL) || []).length;
     let ex = 0, par = 0, d = 0;
     for (let k = 0; k < s.length; k++){ const c = s.charCodeAt(k); if (c === 33) ex++; else if (c === 40) par++; else if (c === 0x2014) d++; }
     par -= (s.match(/\(([A-Z][A-Za-z]{1,6})\)/g) || []).filter(x => COMMON_ACR.has(x.slice(1, -1))).length; // "(AI)"-style definitions are not asides
     d += (s.match(/ – | -- /g) || []).length;
     emdash += d;
     st[o + 6] = ex; st[o + 7] = (s.match(/\d+/g) || []).length + acr; st[o + 9] = par; st[o + 11] = d;
-    st[o + 10] = /^\s*(?:This|These)\b/.test(s) ? 1 : 0;
+    st[o + 10] = cfg.thisRe.test(s) ? 1 : 0;
     st[o + 14] = toks.length >= wAll * 0.5 ? 1 : 0;
     // sloppy: sentence starts lowercase, missing final punctuation in a long sentence, or double spaces
     const trimmed = s.trim();
     let sloppy = 0;
-    if (/^[a-z]/.test(trimmed)) sloppy++;
+    if (/^[a-z]/.test(trimmed) && !prevComma) sloppy++;
+    prevComma = /,$/.test(trimmed);
     if (toks.length > 6 && !/[.!?…:"'”’)\]]$/.test(trimmed) && !/^\s*(?:[-*•#]|\d+\.)/.test(trimmed)) sloppy += 0.5;
     if (/\S {2,}\S/.test(s)) sloppy += 0.5;
     if (/\s[,.]/.test(trimmed)) sloppy += 0.5;
     st[o + 15] = sloppy;
     st[o + 16] = /\n\s*\n\s*$/.test(s) ? 1 : 0;
-    st[o + 17] = Math.min(2, (s.match(/["“”]/g) || []).length / 2);
+    st[o + 17] = Math.min(2, (s.match(/["“”„«»]/g) || []).length / 2);
     st[o + 18] = (s.match(/\?/g) || []).length ? 1 : 0;
     st[o + 20] = lenW; st[o + 21] = longW; st[o + 22] = rareW;
-    st[o + 19] = toks.length > 0 && toks.length < 6 && !/^\s*(?:[-*•#]|\d+\.)/.test(s) && !/,\s*$/.test(trimmed) ? 1 : 0;
+    // greeting, sign-off and name lines ("Dear Sarah,", "Best regards", "Daniel") are not sentences
+    const frag = (toks.length <= 5 && !/[.!?…]["'”’)\]]*$/.test(trimmed)) || (toks.length <= 7 && /,$/.test(trimmed));
+    st[o + 19] = !frag && toks.length > 0 && toks.length < 6 && !/^\s*(?:[-*•#]|\d+\.)/.test(s) ? 1 : 0;
+    st[o + 23] = frag ? 0 : toks.length;
     let pos = 0, neg = 0; const list = [];
-    for (let r = 0; r < RULES.length; r++){
-      const rule = RULES[r];
+    for (let r = 0; r < RULESL.length; r++){
+      const rule = RULESL[r];
       if (rule.re.test(s)){ list.push(rule.id, rule.w); if (rule.w > 0) pos += rule.w; else neg += rule.w; }
     }
     st[o + 12] = pos; st[o + 13] = neg;
@@ -597,14 +703,15 @@ function analyze(text, progress){
     if (acc >= 110 || (acc >= 45 && st[i * K + 16])) open = false;
   }
   // per-block sums
-  const BK = K + 2; // + sentences, sum len^2
+  const BK = K + 3; // + sentences, sum of rhythm len^2, rhythm sentences
   const bs = new Float64Array(Math.max(1, B) * BK);
   for (let i = 0; i < S; i++){
     const b = blockOf[i]; if (b < 0) continue;
     const w = st[i * K]; if (!w) continue;
     const o = b * BK, so = i * K;
     for (let k = 0; k < K; k++) bs[o + k] += st[so + k];
-    bs[o + K] += 1; bs[o + K + 1] += w * w;
+    const rw = st[so + 23];
+    bs[o + K] += 1; bs[o + K + 1] += rw * rw; if (rw) bs[o + K + 2] += 1;
   }
   // paragraph evenness across the whole document
   let paraC = 0;
@@ -634,18 +741,19 @@ function analyze(text, progress){
     const per100 = x => x / W * 100;
     c[0] = 0.42 * Math.min(per100(win[1]), 10) - 0.5;
     c[1] = 3 * Math.min(win[2] / Sn, 0.6);
-    if (Sn >= 4){
-      const mean = W / Sn, cv = Math.sqrt(Math.max(0, win[K + 1] / Sn - mean * mean)) / mean;
+    const Rn = win[K + 2];
+    if (Rn >= 4){
+      const mean = win[23] / Rn, cv = Math.sqrt(Math.max(0, win[K + 1] / Rn - mean * mean)) / mean;
       c[2] = clamp(3.4 * (0.5 - cv), -1.5, 1.1);
     }
-    c[19] = clamp(-0.13 * (W / Sn - 26), -1.6, 0);
-    c[3] = clamp(1.2 * (win[3] / Math.max(1, win[20]) - 4.55), -1, 1);
-    if (win[21] >= 4) c[20] = clamp(-2.5 * (win[22] / win[21] - 0.5), -1, 0.5);
-    c[4] = clamp(0.15 * (per100(win[4]) - 3), -0.6, 0.8);
+    if (Rn > 0) c[19] = clamp(-0.13 * (win[23] / Rn - 26), -1.6, 0);
+    c[3] = clamp(1.2 * (win[3] / Math.max(1, win[20]) - cfg.awl), -1, 1);
+    if (cfg.spec && win[21] >= 4) c[20] = clamp(-2.5 * (win[22] / win[21] - 0.5), -1, 0.5);
+    c[4] = clamp(0.15 * (per100(win[4]) - cfg.nomBase), -0.6, 0.8);
     c[5] = -0.12 * Math.min(per100(win[5]), 8);
     c[6] = -1.6 * Math.min(win[6] / Sn, 0.5);
     c[7] = -0.16 * Math.min(per100(win[7]), 8);
-    c[8] = 0.35 - 0.17 * Math.min(per100(win[8]), 10);
+    c[8] = cfg.pn ? 0.35 - 0.17 * Math.min(per100(win[8]), 10) : 0;
     c[9] = -0.3 * Math.min(per100(win[9]), 3);
     c[10] = 1.5 * Math.min(win[10] / Sn, 0.5);
     c[11] = 0.8 * Math.min(win[11] / Sn, 1);
@@ -691,7 +799,7 @@ function analyze(text, progress){
   for (let b = 0; b < B; b++){ if (bp[b] < 0.7) continue; for (let k = 0; k < NF; k++) if (bc[b * NF + k] >= 0.25) featAi[k]++; }
   progress(100);
   return {
-    starts, p, blockOf, bz, bp, bc, feat: FEAT, reasons, names: REASONS, freqAi, featAi, blocks: B,
+    lang, starts, p, blockOf, bz, bp, bc, feat: FEAT, reasons, names: REASONS, freqAi, featAi, blocks: B,
     hidden: { counts, first, decoded, hgWords },
     stats: { chars: n, words, sentences: sentN, scored, aiC, mixC, aiN, mixN, mean: scored ? pSum / scored : 0, emdash },
     ms: Date.now() - t0,
@@ -715,25 +823,241 @@ self.onmessage = e => {
 const MAX = 5000000, PAGE_CHARS = 14000;
 const $ = id => document.getElementById(id);
 const ta = $('input'), doc = $('doc'), statusEl = $('status');
-const fmt = v => Number(v).toLocaleString('en-US');
 const sig = z => 1 / (1 + Math.exp(-z));
 let runId = 0, wk = null, R = null, text = '', S = 0, pageStarts = [0], page = 0, sel = -1;
 
-const CATS = [
-  { name: 'Zero-width characters', what: 'U+200B, U+200C, U+200D, U+2060, U+FEFF, U+180E. Invisible and take up no space.', why: 'Can be inserted as hidden marks or for tracking. Some editors and copy-paste also leave them.' },
-  { name: 'Unusual spaces', what: 'Narrow no-break space U+202F, thin and hair spaces U+2000–U+200A, U+205F, U+3000.', why: 'U+202F has been reported in some chatbot output. Also normal in French typography and some editors.' },
-  { name: 'No-break spaces', what: 'U+00A0.', why: 'Very common in text copied from web pages and Word. A weak signal on its own, so it does not raise sentence scores.' },
-  { name: 'Direction controls', what: 'U+200E, U+200F, U+202A–U+202E, U+2066–U+2069, U+061C.', why: 'Invisibly change text direction. Rare in normal prose; used to hide or reorder text.' },
-  { name: 'Unicode tag characters', what: 'U+E0000–U+E007F: invisible copies of ASCII letters.', why: 'Can carry a hidden message inside normal-looking text. Any message found is decoded below.' },
-  { name: 'Variation-selector runs', what: 'Two or more variation selectors in a row (U+FE00–U+FE0F, U+E0100–U+E01EF).', why: 'Can hide bytes behind one visible character. A single selector after an emoji is normal and is ignored.' },
-  { name: 'Soft hyphens', what: 'U+00AD.', why: 'Invisible unless a line breaks there. Left by some publishing tools.' },
-  { name: 'Look-alike letters', what: 'Words that mix Latin letters with Cyrillic or Greek ones, such as a Cyrillic "е" inside an English word.', why: 'Used to fingerprint copies or to slip past filters and detectors.' },
-];
+// ---------- interface language ----------
+const LOCALE = { en: 'en-US', de: 'de-DE', nl: 'nl-NL' };
+const I18N = {
+  en: {
+    navCheck: 'Check', navDoc: 'Document', navMarks: 'Hidden marks', navHow: 'How it works',
+    kicker: 'Free. Private. Up to 5,000,000 characters.', headline: 'Know what wrote it.',
+    lede: 'Textprint reads your text the way a detective reads a fingerprint: passage by passage, with every clue shown. It runs entirely in your browser, so nothing is uploaded.',
+    legend: 'Legend', lgAi: 'AI-style', lgMix: 'Mixed', lgHu: 'Human-style', lgHid: 'Hidden character',
+    checkTitle: 'Paste. Analyze. See why.', inputAria: 'Text to analyze', analyze: 'Analyze', analyzing: 'Analyzing…',
+    upload: 'Upload .txt / .md', sample: 'Load sample', clear: 'Clear', count: '{n} / {max} characters', progAria: 'Analysis progress',
+    docTitle: 'Every sentence, marked.', mapAria: 'Overview of the whole text. Red marks are AI-style passages. Click to jump.',
+    start: 'start', end: 'end', prev: '◂ Prev', prevAria: 'Previous page', next: 'Next ▸', nextAria: 'Next page', nextAi: 'Next AI-style passage',
+    howTitle: 'How this works, and what it can\'t do',
+    howBody: '<p>The text is split into passages of about 100 words. Each passage is measured as a whole, the way detectors like ZeroGPT work, because clean AI writing rarely gives itself away in a single sentence. Each sentence then gets its passage\'s score, adjusted by anything specific to that sentence.</p><ul><li><b>Languages:</b> English, German and Dutch are recognised automatically, each with its own word lists and phrase patterns. Other languages get only the language-neutral checks.</li><li><b>Style statistics:</b> how evenly sentence lengths run, average word length, how many abstract nouns (-tion, -ment, -ity), trailing "-ing" clauses (", ensuring…"), and how polished the punctuation is.</li><li><b>Specifics:</b> human writing tends to carry names, places, numbers, a personal "I", asides in parentheses and exclamation marks. Generic text without them leans AI.</li><li><b>Wording:</b> words and stock phrases that language models overuse ("enhance", "crucial", "delve", "a testament to", "it\'s important to note").</li><li><b>Templates:</b> "not just X, but Y", "Whether you\'re a… or a…", essay-style wrap-ups, formal transitions at the start of sentences.</li><li><b>Formatting:</b> markdown bold and headings, bullets with bold lead-ins, emoji bullets, frequent em dashes.</li><li><b>Human signals lower the score:</b> slang, typos, lowercase "i", repeated punctuation, uneven rhythm.</li><li><b>Hidden characters:</b> zero-width characters, unusual spaces, direction controls, Unicode tag characters and variation-selector runs (which can carry a hidden message, decoded here), and look-alike letters from other alphabets.</li></ul><p><b>No detector is 100% accurate, this one included.</b> Formal human writing (legal, academic, corporate) can score high. AI text that someone edited or rewrote can score low. Claude and GPT don\'t put a detectable watermark in their text, so no tool can prove who wrote something. Hidden characters prove the text passed through some tool or editor, not that an AI wrote it. Use the score as a reason to look closer, never as proof against a person.</p><p>It doesn\'t name the model (Claude, GPT, Gemini). Their styles overlap too much to tell apart reliably.</p>',
+    reading: 'Reading', runFirst: 'Run an analysis to see the score.', honest: 'These are AI-style signals, not proof. See "How this works" below the document.',
+    whyTitle: 'Why this sentence', clickHint: 'Click any sentence in the document to see what raised or lowered its score.',
+    topTitle: 'Most frequent signals', nothingYet: 'Nothing yet.', marksTitle: 'Hidden marks', copyClean: 'Copy cleaned text', useClean: 'Clean and re-check',
+    fine1: 'Textprint estimates how AI-like a text reads from its style and wording. No detector, including this one, is 100% accurate: formal human writing can score high and edited AI text can score low. Claude and GPT do not embed a detectable watermark, so a score is never proof of who wrote something. Please don\'t use it as the only basis for decisions about a person.',
+    fine2: 'Your text never leaves this browser tab. Hidden-character results show that text passed through some tool or editor, not that an AI wrote it.',
+    pReading: 'Reading the text…', pMeasure: 'Measuring each sentence…', pHidden: 'Scanning for hidden characters…', pScore: 'Scoring passages…', pFinish: 'Finishing up…', pDone: 'Done', pStopped: 'Stopped',
+    stEmpty: 'Paste text or upload a file first.', stBlocked: 'Your browser blocked the analyzer: {e}', stFailed: 'Analysis failed: {e}', stChecked: 'Checked {n} characters in {t}.',
+    charsN: '{n} characters', v1: 'Mostly human-style', v2: 'Mixed: some AI-style passages', v3: 'Largely AI-style', v4: 'Strongly AI-style throughout',
+    ringLab: 'AI-style', kvAi: 'AI-style sentences', kvMix: 'Mixed sentences', kvAll: 'All sentences', kvAvg: 'Average sentence score', kvWords: 'Words', kvDash: 'Em dashes', kvHid: 'Hidden characters', kvLang: 'Text language',
+    lang_en: 'English', lang_de: 'German', lang_nl: 'Dutch', tooShort: 'Under 80 words is too short for a reliable reading.',
+    topIntro: 'What pushed AI-style passages over the line.', passages: 'passages', sentences: 'sentences', noAiPassages: 'No AI-style passages found.',
+    showFirst: 'Show first', hiddenMsg: 'Hidden message · {kind} · at character {pos}', kTag: 'Tag characters', kVs: 'Variation selectors', lookalike: 'Look-alike words:',
+    hidAny: 'Hidden characters show the text went through some tool or editor. They don\'t prove an AI wrote it.', hidNone: 'No hidden characters found. Missing marks don\'t prove a human wrote it.',
+    pinfo: 'Page {p} of {n} · sentences {a}–{b}', blank: 'This is blank space between sentences.', chipAi: 'AI-style', chipMix: 'Mixed', chipHu: 'Human-style', sentenceN: 'Sentence {n}',
+    thisPassage: 'This passage · {p}% AI-style', noPassage: 'No strong passage signals either way.', thisSentence: 'This sentence', nothingSentence: 'Nothing specific to this sentence. Its score comes from the passage around it.',
+    loaded: 'Loaded {f}.', loadedCut: 'Loaded {f} (cut to the first 5,000,000 characters).', readFail: 'Could not read {f}: {e}', noAiFound: 'No AI-style passages found.', nothingClean: 'Nothing to clean yet.',
+    copied: 'Copied cleaned text. {n} hidden characters removed; special spaces and look-alike letters replaced.', copyBlocked: 'Copying was blocked. The cleaned text is now in the box and selected; press Ctrl+C.',
+  },
+  de: {
+    navCheck: 'Prüfen', navDoc: 'Dokument', navMarks: 'Versteckte Zeichen', navHow: 'So funktioniert’s',
+    kicker: 'Kostenlos. Privat. Bis zu 5.000.000 Zeichen.', headline: 'Wer hat das geschrieben?',
+    lede: 'Textprint liest deinen Text wie ein Ermittler einen Fingerabdruck: Abschnitt für Abschnitt, mit jedem Hinweis sichtbar. Alles läuft in deinem Browser, es wird nichts hochgeladen.',
+    legend: 'Legende', lgAi: 'KI-typisch', lgMix: 'Gemischt', lgHu: 'Menschlich', lgHid: 'Verstecktes Zeichen',
+    checkTitle: 'Einfügen. Prüfen. Verstehen.', inputAria: 'Zu prüfender Text', analyze: 'Prüfen', analyzing: 'Wird geprüft…',
+    upload: '.txt / .md hochladen', sample: 'Beispiel laden', clear: 'Leeren', count: '{n} / {max} Zeichen', progAria: 'Fortschritt der Analyse',
+    docTitle: 'Jeder Satz, markiert.', mapAria: 'Übersicht über den ganzen Text. Rote Markierungen sind KI-typische Abschnitte. Klicken zum Springen.',
+    start: 'Anfang', end: 'Ende', prev: '◂ Zurück', prevAria: 'Vorherige Seite', next: 'Weiter ▸', nextAria: 'Nächste Seite', nextAi: 'Nächster KI-typischer Abschnitt',
+    howTitle: 'So funktioniert’s, und was es nicht kann',
+    howBody: '<p>Der Text wird in Abschnitte von etwa 100 Wörtern geteilt. Jeder Abschnitt wird als Ganzes gemessen, so wie es Detektoren wie ZeroGPT tun, denn saubere KI-Texte verraten sich selten in einem einzigen Satz. Jeder Satz erhält dann die Bewertung seines Abschnitts, ergänzt um Merkmale dieses Satzes.</p><ul><li><b>Sprachen:</b> Englisch, Deutsch und Niederländisch werden automatisch erkannt, jeweils mit eigenen Wortlisten und Formulierungsmustern. Andere Sprachen erhalten nur die sprachunabhängigen Prüfungen.</li><li><b>Stilstatistik:</b> wie gleichmäßig die Satzlängen sind, durchschnittliche Wortlänge, Anteil abstrakter Substantive (-ung, -heit, -keit), angehängte Nebensätze („, wodurch…“) und wie glatt die Zeichensetzung ist.</li><li><b>Konkretes:</b> Menschen schreiben eher mit Namen, Orten, Zahlen, einem persönlichen „ich“, Klammerbemerkungen und Ausrufezeichen. Allgemeiner Text ohne all das wirkt eher wie KI.</li><li><b>Wortwahl:</b> Wörter und Floskeln, die Sprachmodelle häufig verwenden („entscheidend“, „ganzheitlich“, „nahtlos“, „spielt eine entscheidende Rolle“, „es ist wichtig zu beachten“).</li><li><b>Schablonen:</b> „nicht nur X, sondern auch Y“, „Ob Anfänger oder Profi“, Aufsatz-Schlüsse wie „Zusammenfassend“, förmliche Überleitungen am Satzanfang.</li><li><b>Formatierung:</b> Markdown-Fettdruck und Überschriften, Aufzählungen mit fettem Anfang, Emoji als Aufzählungszeichen, häufige Gedankenstriche.</li><li><b>Menschliche Signale senken die Bewertung:</b> Umgangssprache, Tippfehler, mehrfache Satzzeichen, unruhiger Rhythmus.</li><li><b>Versteckte Zeichen:</b> Null-Breite-Zeichen, ungewöhnliche Leerzeichen, Richtungssteuerzeichen, Unicode-Tag-Zeichen und Variationsselektoren (die eine versteckte Nachricht tragen können, hier entschlüsselt) sowie ähnlich aussehende Buchstaben aus anderen Alphabeten.</li></ul><p><b>Kein Detektor ist zu 100 % genau, auch dieser nicht.</b> Förmliche menschliche Texte (juristisch, wissenschaftlich, geschäftlich) können hoch bewertet werden. Überarbeitete KI-Texte können niedrig bewertet werden. Claude und GPT setzen kein erkennbares Wasserzeichen in ihre Texte, daher kann kein Werkzeug beweisen, wer etwas geschrieben hat. Versteckte Zeichen zeigen nur, dass ein Text durch ein Werkzeug oder einen Editor gegangen ist, nicht dass eine KI ihn geschrieben hat. Nutze die Bewertung als Anlass, genauer hinzusehen, nie als Beweis gegen eine Person.</p><p>Das Modell (Claude, GPT, Gemini) wird nicht genannt. Ihre Stile überschneiden sich zu stark, um sie zuverlässig zu unterscheiden.</p>',
+    reading: 'Ergebnis', runFirst: 'Starte eine Prüfung, um die Bewertung zu sehen.', honest: 'Das sind KI-typische Signale, kein Beweis. Siehe „So funktioniert’s“ unter dem Dokument.',
+    whyTitle: 'Warum dieser Satz', clickHint: 'Klicke auf einen Satz im Dokument, um zu sehen, was seine Bewertung erhöht oder gesenkt hat.',
+    topTitle: 'Häufigste Signale', nothingYet: 'Noch nichts.', marksTitle: 'Versteckte Zeichen', copyClean: 'Bereinigten Text kopieren', useClean: 'Bereinigen und neu prüfen',
+    fine1: 'Textprint schätzt anhand von Stil und Wortwahl, wie KI-typisch ein Text wirkt. Kein Detektor, auch dieser nicht, ist zu 100 % genau: Förmliche menschliche Texte können hoch bewertet werden und überarbeitete KI-Texte niedrig. Claude und GPT setzen kein erkennbares Wasserzeichen, daher ist eine Bewertung nie ein Beweis dafür, wer etwas geschrieben hat. Bitte triff Entscheidungen über eine Person nicht allein auf dieser Grundlage.',
+    fine2: 'Dein Text verlässt nie diesen Browser-Tab. Gefundene versteckte Zeichen zeigen, dass ein Text durch ein Werkzeug oder einen Editor gegangen ist, nicht dass eine KI ihn geschrieben hat.',
+    pReading: 'Text wird gelesen…', pMeasure: 'Sätze werden gemessen…', pHidden: 'Suche nach versteckten Zeichen…', pScore: 'Abschnitte werden bewertet…', pFinish: 'Wird abgeschlossen…', pDone: 'Fertig', pStopped: 'Abgebrochen',
+    stEmpty: 'Füge zuerst einen Text ein oder lade eine Datei hoch.', stBlocked: 'Dein Browser hat die Analyse blockiert: {e}', stFailed: 'Analyse fehlgeschlagen: {e}', stChecked: '{n} Zeichen in {t} geprüft.',
+    charsN: '{n} Zeichen', v1: 'Überwiegend menschlich', v2: 'Gemischt: einige KI-typische Abschnitte', v3: 'Größtenteils KI-typisch', v4: 'Durchgehend stark KI-typisch',
+    ringLab: 'KI-typisch', kvAi: 'KI-typische Sätze', kvMix: 'Gemischte Sätze', kvAll: 'Alle Sätze', kvAvg: 'Durchschnittliche Satzbewertung', kvWords: 'Wörter', kvDash: 'Gedankenstriche', kvHid: 'Versteckte Zeichen', kvLang: 'Sprache des Textes',
+    lang_en: 'Englisch', lang_de: 'Deutsch', lang_nl: 'Niederländisch', tooShort: 'Unter 80 Wörtern ist zu kurz für eine verlässliche Bewertung.',
+    topIntro: 'Was KI-typische Abschnitte über die Schwelle gebracht hat.', passages: 'Abschnitte', sentences: 'Sätze', noAiPassages: 'Keine KI-typischen Abschnitte gefunden.',
+    showFirst: 'Erstes zeigen', hiddenMsg: 'Versteckte Nachricht · {kind} · bei Zeichen {pos}', kTag: 'Tag-Zeichen', kVs: 'Variationsselektoren', lookalike: 'Wörter mit ähnlich aussehenden Buchstaben:',
+    hidAny: 'Versteckte Zeichen zeigen, dass der Text durch ein Werkzeug oder einen Editor gegangen ist. Sie beweisen nicht, dass eine KI ihn geschrieben hat.', hidNone: 'Keine versteckten Zeichen gefunden. Das beweist nicht, dass ein Mensch den Text geschrieben hat.',
+    pinfo: 'Seite {p} von {n} · Sätze {a}–{b}', blank: 'Das ist Leerraum zwischen Sätzen.', chipAi: 'KI-typisch', chipMix: 'Gemischt', chipHu: 'Menschlich', sentenceN: 'Satz {n}',
+    thisPassage: 'Dieser Abschnitt · {p} % KI-typisch', noPassage: 'Keine starken Signale in diesem Abschnitt.', thisSentence: 'Dieser Satz', nothingSentence: 'Nichts Besonderes in diesem Satz. Seine Bewertung kommt vom Abschnitt drumherum.',
+    loaded: '{f} geladen.', loadedCut: '{f} geladen (auf die ersten 5.000.000 Zeichen gekürzt).', readFail: '{f} konnte nicht gelesen werden: {e}', noAiFound: 'Keine KI-typischen Abschnitte gefunden.', nothingClean: 'Noch nichts zu bereinigen.',
+    copied: 'Bereinigter Text kopiert. {n} versteckte Zeichen entfernt; Sonderleerzeichen und ähnlich aussehende Buchstaben ersetzt.', copyBlocked: 'Kopieren wurde blockiert. Der bereinigte Text steht jetzt markiert im Feld; drücke Strg+C.',
+  },
+  nl: {
+    navCheck: 'Controleren', navDoc: 'Document', navMarks: 'Verborgen tekens', navHow: 'Zo werkt het',
+    kicker: 'Gratis. Privé. Tot 5.000.000 tekens.', headline: 'Weet wie het schreef.',
+    lede: 'Textprint leest je tekst zoals een rechercheur een vingerafdruk leest: alinea voor alinea, met elk spoor zichtbaar. Alles draait in je browser, er wordt niets geüpload.',
+    legend: 'Legenda', lgAi: 'AI-stijl', lgMix: 'Gemengd', lgHu: 'Menselijk', lgHid: 'Verborgen teken',
+    checkTitle: 'Plakken. Controleren. Begrijpen.', inputAria: 'Te controleren tekst', analyze: 'Controleren', analyzing: 'Bezig…',
+    upload: '.txt / .md uploaden', sample: 'Voorbeeld laden', clear: 'Wissen', count: '{n} / {max} tekens', progAria: 'Voortgang van de analyse',
+    docTitle: 'Elke zin, gemarkeerd.', mapAria: 'Overzicht van de hele tekst. Rode markeringen zijn passages in AI-stijl. Klik om ernaartoe te gaan.',
+    start: 'begin', end: 'einde', prev: '◂ Vorige', prevAria: 'Vorige pagina', next: 'Volgende ▸', nextAria: 'Volgende pagina', nextAi: 'Volgende passage in AI-stijl',
+    howTitle: 'Zo werkt het, en wat het niet kan',
+    howBody: '<p>De tekst wordt opgedeeld in passages van ongeveer 100 woorden. Elke passage wordt als geheel gemeten, zoals detectoren als ZeroGPT dat doen, want nette AI-tekst verraadt zich zelden in één zin. Elke zin krijgt daarna de score van zijn passage, aangevuld met wat specifiek in die zin staat.</p><ul><li><b>Talen:</b> Engels, Duits en Nederlands worden automatisch herkend, elk met eigen woordenlijsten en zinspatronen. Andere talen krijgen alleen de taalonafhankelijke controles.</li><li><b>Stijlstatistiek:</b> hoe gelijkmatig zinslengtes zijn, gemiddelde woordlengte, aantal abstracte zelfstandige naamwoorden (-ing, -heid, -tie), aangehangen bijzinnen (", waardoor…") en hoe verzorgd de interpunctie is.</li><li><b>Details:</b> mensen schrijven vaker met namen, plaatsen, getallen, een persoonlijke "ik", opmerkingen tussen haakjes en uitroeptekens. Algemene tekst zonder dat neigt naar AI.</li><li><b>Woordkeus:</b> woorden en clichés die taalmodellen vaak gebruiken ("cruciaal", "naadloos", "veelzijdig", "speelt een cruciale rol", "het is belangrijk om op te merken").</li><li><b>Sjablonen:</b> "niet alleen X, maar ook Y", "Of je nu een beginner bent of…", opstel-afsluiters als "Kortom", formele overgangen aan het begin van zinnen.</li><li><b>Opmaak:</b> vetgedrukte markdown en kopjes, opsommingen met een vet begin, emoji als opsommingsteken, veel gedachtestreepjes.</li><li><b>Menselijke signalen verlagen de score:</b> spreektaal, typefouten, herhaalde leestekens, onregelmatig ritme.</li><li><b>Verborgen tekens:</b> tekens zonder breedte, ongewone spaties, richtingstekens, Unicode-tagtekens en variatieselectoren (die een verborgen bericht kunnen bevatten, hier ontcijferd) en letters uit andere alfabetten die erop lijken.</li></ul><p><b>Geen enkele detector is 100% nauwkeurig, deze ook niet.</b> Formele menselijke tekst (juridisch, academisch, zakelijk) kan hoog scoren. AI-tekst die iemand heeft bewerkt kan laag scoren. Claude en GPT plaatsen geen herkenbaar watermerk in hun tekst, dus geen enkel hulpmiddel kan bewijzen wie iets schreef. Verborgen tekens bewijzen alleen dat de tekst door een programma of editor is gegaan, niet dat een AI hem schreef. Gebruik de score als reden om beter te kijken, nooit als bewijs tegen iemand.</p><p>Het model (Claude, GPT, Gemini) wordt niet genoemd. Hun stijlen lijken te veel op elkaar om ze betrouwbaar te onderscheiden.</p>',
+    reading: 'Uitslag', runFirst: 'Start een controle om de score te zien.', honest: 'Dit zijn signalen van AI-stijl, geen bewijs. Zie "Zo werkt het" onder het document.',
+    whyTitle: 'Waarom deze zin', clickHint: 'Klik op een zin in het document om te zien wat de score verhoogde of verlaagde.',
+    topTitle: 'Meest voorkomende signalen', nothingYet: 'Nog niets.', marksTitle: 'Verborgen tekens', copyClean: 'Opgeschoonde tekst kopiëren', useClean: 'Opschonen en opnieuw controleren',
+    fine1: 'Textprint schat op basis van stijl en woordkeus hoe AI-achtig een tekst leest. Geen enkele detector, ook deze niet, is 100% nauwkeurig: formele menselijke tekst kan hoog scoren en bewerkte AI-tekst laag. Claude en GPT plaatsen geen herkenbaar watermerk, dus een score is nooit bewijs van wie iets schreef. Baseer beslissingen over een persoon er alsjeblieft niet alleen op.',
+    fine2: 'Je tekst verlaat dit browsertabblad nooit. Gevonden verborgen tekens tonen dat tekst door een programma of editor is gegaan, niet dat een AI hem schreef.',
+    pReading: 'Tekst lezen…', pMeasure: 'Zinnen meten…', pHidden: 'Zoeken naar verborgen tekens…', pScore: 'Passages beoordelen…', pFinish: 'Afronden…', pDone: 'Klaar', pStopped: 'Gestopt',
+    stEmpty: 'Plak eerst een tekst of upload een bestand.', stBlocked: 'Je browser blokkeerde de analyse: {e}', stFailed: 'Analyse mislukt: {e}', stChecked: '{n} tekens gecontroleerd in {t}.',
+    charsN: '{n} tekens', v1: 'Grotendeels menselijk', v2: 'Gemengd: enkele passages in AI-stijl', v3: 'Grotendeels AI-stijl', v4: 'Overal sterk AI-stijl',
+    ringLab: 'AI-stijl', kvAi: 'Zinnen in AI-stijl', kvMix: 'Gemengde zinnen', kvAll: 'Alle zinnen', kvAvg: 'Gemiddelde zinsscore', kvWords: 'Woorden', kvDash: 'Gedachtestreepjes', kvHid: 'Verborgen tekens', kvLang: 'Taal van de tekst',
+    lang_en: 'Engels', lang_de: 'Duits', lang_nl: 'Nederlands', tooShort: 'Minder dan 80 woorden is te kort voor een betrouwbare uitslag.',
+    topIntro: 'Wat passages in AI-stijl over de grens duwde.', passages: 'passages', sentences: 'zinnen', noAiPassages: 'Geen passages in AI-stijl gevonden.',
+    showFirst: 'Eerste tonen', hiddenMsg: 'Verborgen bericht · {kind} · bij teken {pos}', kTag: 'Tagtekens', kVs: 'Variatieselectoren', lookalike: 'Woorden met lookalike-letters:',
+    hidAny: 'Verborgen tekens tonen dat de tekst door een programma of editor is gegaan. Ze bewijzen niet dat een AI hem schreef.', hidNone: 'Geen verborgen tekens gevonden. Dat bewijst niet dat een mens de tekst schreef.',
+    pinfo: 'Pagina {p} van {n} · zinnen {a}–{b}', blank: 'Dit is witruimte tussen zinnen.', chipAi: 'AI-stijl', chipMix: 'Gemengd', chipHu: 'Menselijk', sentenceN: 'Zin {n}',
+    thisPassage: 'Deze passage · {p}% AI-stijl', noPassage: 'Geen sterke signalen in deze passage.', thisSentence: 'Deze zin', nothingSentence: 'Niets bijzonders in deze zin. De score komt van de passage eromheen.',
+    loaded: '{f} geladen.', loadedCut: '{f} geladen (ingekort tot de eerste 5.000.000 tekens).', readFail: '{f} kon niet worden gelezen: {e}', noAiFound: 'Geen passages in AI-stijl gevonden.', nothingClean: 'Nog niets om op te schonen.',
+    copied: 'Opgeschoonde tekst gekopieerd. {n} verborgen tekens verwijderd; speciale spaties en lookalike-letters vervangen.', copyBlocked: 'Kopiëren werd geblokkeerd. De opgeschoonde tekst staat nu geselecteerd in het vak; druk op Ctrl+C.',
+  },
+};
+// signal names come from the analyzer in English; these are their German and Dutch versions
+const SIG = {
+  de: {
+    'Chatbot self-reference ("as an AI…")': 'Chatbot spricht über sich („als KI…“)', 'Chatbot interface artifact': 'Rest aus einer Chatbot-Oberfläche',
+    'Assistant sign-off ("I hope this helps")': 'Assistenten-Schluss („Ich hoffe, das hilft“)', 'Assistant-style opener ("Certainly!")': 'Assistenten-Einstieg („Gerne!“)',
+    'Assistant-style opener ("Great question")': 'Assistenten-Einstieg („Gute Frage“)', 'Assistant-style offer ("Let me know if…")': 'Assistenten-Angebot („Lass mich wissen, ob…“)',
+    'Assistant-style offer ("Feel free to…")': 'Assistenten-Angebot („Gerne kannst du…“)', 'Assistant framing ("Here\'s a breakdown")': 'Assistenten-Rahmung („Hier ist eine Übersicht“)',
+    'Stock hedge ("It\'s important to note")': 'Floskel („Es ist wichtig zu beachten“)', 'Stock phrase: "a testament to"': 'Floskel: „ein Beweis für“',
+    'Stock opener: "In today\'s fast-paced…"': 'Floskel-Einstieg: „In der heutigen schnelllebigen…“', 'Stock phrase: "ever-evolving landscape"': 'Floskel: „sich ständig wandelnde Landschaft“',
+    'Stock phrase: "navigate the complexities"': 'Floskel: „die Komplexität bewältigen“', 'Stock phrase: "unlock the potential"': 'Floskel: „Potenzial entfalten“',
+    'Stock phrase: "plays a crucial role"': 'Floskel: „spielt eine entscheidende Rolle“', 'Stock phrase: "a myriad of"': 'Floskel: „eine Vielzahl von“',
+    'Stock phrase: "shed light on"': 'Floskel: „Licht ins Dunkel bringen“', 'Stock phrase: "dive into"': 'Floskel: „eintauchen in“',
+    'Template: "Whether you\'re a… or a…"': 'Schablone: „Ob Anfänger oder Profi…“', 'Marketing stock phrase': 'Werbefloskel', 'Listicle template ("Key takeaways")': 'Listen-Schablone („Die wichtigsten Punkte“)',
+    'Essay-template wrap-up': 'Aufsatz-Schluss („Zusammenfassend…“)', 'Formal transition at sentence start': 'Förmliche Überleitung am Satzanfang („Darüber hinaus…“)',
+    'Contrast template: "not just X, but Y"': 'Kontrast-Schablone: „nicht nur X, sondern auch Y“', 'Contrast template: "It\'s not X, it\'s Y"': 'Kontrast-Schablone: „Es geht nicht um X, sondern um Y“',
+    'Colon reveal ("The result: …")': 'Doppelpunkt-Pointe („Das Ergebnis: …“)', 'List of three ("A, B, and C")': 'Dreierliste („A, B und C“)',
+    'Template: "From X to Y, …"': 'Schablone: „Von X bis Y …“', 'Stock phrase: "has become an important part of"': 'Floskel: „ist ein wichtiger Bestandteil … geworden“',
+    'Stock hedge ("It is important to…")': 'Floskel („Es ist wichtig, …“)', 'Balanced-take template ("While it offers many benefits…")': 'Abwägungs-Schablone („Obwohl es viele Vorteile bietet…“)',
+    'Stock phrase: "changing the world"': 'Floskel: „verändert die Welt“', 'Paired comparatives ("easier and faster")': 'Doppelter Komparativ („einfacher und schneller“)',
+    'Stock closer: "use it responsibly"': 'Floskel-Schluss: „verantwortungsvoll nutzen“', 'Generic "our lives"': 'Allgemeines „unser Alltag“', 'Template email phrasing': 'Schablonenhafte E-Mail-Formulierung',
+    'Template: "less about X, more about Y"': 'Schablone: „weniger X, mehr Y“', 'Reflective template ("Looking back…", "I used to think…")': 'Rückblick-Schablone („Rückblickend…“, „Früher dachte ich…“)',
+    'Markdown bold (**text**)': 'Markdown-Fettdruck (**Text**)', 'Markdown heading (# …)': 'Markdown-Überschrift (# …)', 'Bullet with bold lead-in': 'Aufzählung mit fettem Anfang',
+    'Emoji used as bullet or heading': 'Emoji als Aufzählungszeichen oder Überschrift', 'Casual slang (human-like)': 'Umgangssprache (menschlich)', 'Repeated punctuation (human-like)': 'Mehrfache Satzzeichen (menschlich)',
+    'Lowercase "i" (human-like)': 'Kleines „i“ (menschlich)', 'Typo or missing apostrophe (human-like)': 'Tippfehler (menschlich)', 'Contains hidden characters': 'Enthält versteckte Zeichen',
+    'Contains unusual space characters (e.g. U+202F)': 'Enthält ungewöhnliche Leerzeichen (z. B. U+202F)', 'Contains a word with look-alike letters': 'Enthält ein Wort mit ähnlich aussehenden Buchstaben',
+    'AI-favored vocabulary': 'Von KI bevorzugte Wörter', 'Little AI-favored vocabulary': 'Kaum KI-typische Wörter', 'Trailing "-ing" clauses (", ensuring…", ", making…")': 'Angehängte Nebensätze („, wodurch…“)',
+    'Even sentence lengths (low burstiness)': 'Gleichmäßige Satzlängen', 'Varied sentence lengths (human-like)': 'Wechselnde Satzlängen (menschlich)', 'Long words on average': 'Im Schnitt lange Wörter',
+    'Short, plain words': 'Kurze, einfache Wörter', 'Many abstract nouns (-tion, -ment, -ity)': 'Viele abstrakte Substantive (-ung, -heit, -keit)', 'Few abstract nouns': 'Wenige abstrakte Substantive',
+    'Personal voice (I, me, my)': 'Persönliche Stimme (ich, mir, mein)', 'Exclamation marks': 'Ausrufezeichen', 'Specific numbers, dates and technical terms': 'Konkrete Zahlen, Daten und Fachbegriffe',
+    'Generic, few names or places': 'Allgemein, kaum Namen oder Orte', 'Names, places and proper nouns': 'Namen, Orte und Eigennamen', 'Parenthetical asides': 'Klammerbemerkungen',
+    'Sentences opening with "This/These…"': 'Sätze beginnen mit „Dies/Diese…“', 'Em dashes': 'Gedankenstriche', 'AI stock phrases and formatting': 'KI-Floskeln und Formatierung',
+    'Slang, typos or casual punctuation': 'Umgangssprache, Tippfehler oder lockere Zeichensetzung', 'Polished punctuation and capitalization': 'Glatte Zeichensetzung und Großschreibung',
+    'Loose punctuation or capitalization': 'Lockere Zeichensetzung oder Großschreibung', 'Quotes or dialogue': 'Zitate oder Dialog', 'Questions': 'Fragen', 'Very short sentences (human-like)': 'Sehr kurze Sätze (menschlich)',
+    'Evenly sized paragraphs': 'Gleich lange Absätze', 'Uneven paragraph sizes': 'Unterschiedlich lange Absätze', 'Long, dense sentences (human-like)': 'Lange, dichte Sätze (menschlich)',
+    'Generic vocabulary, few specialist terms': 'Allgemeiner Wortschatz, kaum Fachbegriffe', 'Specialist or technical vocabulary': 'Fach- oder Spezialwortschatz',
+  },
+  nl: {
+    'Chatbot self-reference ("as an AI…")': 'Chatbot verwijst naar zichzelf ("als AI…")', 'Chatbot interface artifact': 'Restant van een chatbot-interface',
+    'Assistant sign-off ("I hope this helps")': 'Assistent-afsluiter ("Ik hoop dat dit helpt")', 'Assistant-style opener ("Certainly!")': 'Assistent-opener ("Zeker!")',
+    'Assistant-style opener ("Great question")': 'Assistent-opener ("Goede vraag")', 'Assistant-style offer ("Let me know if…")': 'Assistent-aanbod ("Laat me weten als…")',
+    'Assistant-style offer ("Feel free to…")': 'Assistent-aanbod ("Voel je vrij om…")', 'Assistant framing ("Here\'s a breakdown")': 'Assistent-inleiding ("Hier is een overzicht")',
+    'Stock hedge ("It\'s important to note")': 'Cliché ("Het is belangrijk om op te merken")', 'Stock phrase: "a testament to"': 'Cliché: "een bewijs van"',
+    'Stock opener: "In today\'s fast-paced…"': 'Cliché-opening: "In de snel veranderende wereld van vandaag…"', 'Stock phrase: "ever-evolving landscape"': 'Cliché: "steeds veranderende landschap"',
+    'Stock phrase: "navigate the complexities"': 'Cliché: "de complexiteit navigeren"', 'Stock phrase: "unlock the potential"': 'Cliché: "het potentieel benutten"',
+    'Stock phrase: "plays a crucial role"': 'Cliché: "speelt een cruciale rol"', 'Stock phrase: "a myriad of"': 'Cliché: "een veelheid aan"',
+    'Stock phrase: "shed light on"': 'Cliché: "licht werpen op"', 'Stock phrase: "dive into"': 'Cliché: "duiken in"',
+    'Template: "Whether you\'re a… or a…"': 'Sjabloon: "Of je nu een… bent of…"', 'Marketing stock phrase': 'Marketingcliché', 'Listicle template ("Key takeaways")': 'Lijstjes-sjabloon ("Belangrijkste punten")',
+    'Essay-template wrap-up': 'Opstel-afsluiter ("Kortom…")', 'Formal transition at sentence start': 'Formele overgang aan het begin van de zin ("Daarnaast…")',
+    'Contrast template: "not just X, but Y"': 'Contrastsjabloon: "niet alleen X, maar ook Y"', 'Contrast template: "It\'s not X, it\'s Y"': 'Contrastsjabloon: "Het gaat niet om X, maar om Y"',
+    'Colon reveal ("The result: …")': 'Dubbelepunt-onthulling ("Het resultaat: …")', 'List of three ("A, B, and C")': 'Opsomming van drie ("A, B en C")',
+    'Template: "From X to Y, …"': 'Sjabloon: "Van X tot Y…"', 'Stock phrase: "has become an important part of"': 'Cliché: "is een belangrijk onderdeel van … geworden"',
+    'Stock hedge ("It is important to…")': 'Cliché ("Het is belangrijk om…")', 'Balanced-take template ("While it offers many benefits…")': 'Afweegsjabloon ("Hoewel het veel voordelen biedt…")',
+    'Stock phrase: "changing the world"': 'Cliché: "verandert de wereld"', 'Paired comparatives ("easier and faster")': 'Dubbele vergrotende trap ("makkelijker en sneller")',
+    'Stock closer: "use it responsibly"': 'Cliché-afsluiter: "verantwoord gebruiken"', 'Generic "our lives"': 'Algemeen "ons dagelijks leven"', 'Template email phrasing': 'Sjabloonachtige e-mailzin',
+    'Template: "less about X, more about Y"': 'Sjabloon: "minder X, meer Y"', 'Reflective template ("Looking back…", "I used to think…")': 'Terugblik-sjabloon ("Achteraf gezien…", "Vroeger dacht ik…")',
+    'Markdown bold (**text**)': 'Vetgedrukte markdown (**tekst**)', 'Markdown heading (# …)': 'Markdown-kopje (# …)', 'Bullet with bold lead-in': 'Opsomming met vet begin',
+    'Emoji used as bullet or heading': 'Emoji als opsommingsteken of kopje', 'Casual slang (human-like)': 'Spreektaal (menselijk)', 'Repeated punctuation (human-like)': 'Herhaalde leestekens (menselijk)',
+    'Lowercase "i" (human-like)': 'Kleine letter "i" (menselijk)', 'Typo or missing apostrophe (human-like)': 'Typefout (menselijk)', 'Contains hidden characters': 'Bevat verborgen tekens',
+    'Contains unusual space characters (e.g. U+202F)': 'Bevat ongewone spaties (bijv. U+202F)', 'Contains a word with look-alike letters': 'Bevat een woord met lookalike-letters',
+    'AI-favored vocabulary': 'Woorden die AI graag gebruikt', 'Little AI-favored vocabulary': 'Weinig typische AI-woorden', 'Trailing "-ing" clauses (", ensuring…", ", making…")': 'Aangehangen bijzinnen (", waardoor…")',
+    'Even sentence lengths (low burstiness)': 'Gelijkmatige zinslengtes', 'Varied sentence lengths (human-like)': 'Wisselende zinslengtes (menselijk)', 'Long words on average': 'Gemiddeld lange woorden',
+    'Short, plain words': 'Korte, eenvoudige woorden', 'Many abstract nouns (-tion, -ment, -ity)': 'Veel abstracte zelfstandige naamwoorden (-ing, -heid, -tie)', 'Few abstract nouns': 'Weinig abstracte zelfstandige naamwoorden',
+    'Personal voice (I, me, my)': 'Persoonlijke stem (ik, mij, mijn)', 'Exclamation marks': 'Uitroeptekens', 'Specific numbers, dates and technical terms': 'Concrete getallen, data en vaktermen',
+    'Generic, few names or places': 'Algemeen, weinig namen of plaatsen', 'Names, places and proper nouns': 'Namen, plaatsen en eigennamen', 'Parenthetical asides': 'Opmerkingen tussen haakjes',
+    'Sentences opening with "This/These…"': 'Zinnen die beginnen met "Dit/Deze…"', 'Em dashes': 'Gedachtestreepjes', 'AI stock phrases and formatting': 'AI-clichés en opmaak',
+    'Slang, typos or casual punctuation': 'Spreektaal, typefouten of losse interpunctie', 'Polished punctuation and capitalization': 'Verzorgde interpunctie en hoofdletters',
+    'Loose punctuation or capitalization': 'Losse interpunctie of hoofdletters', 'Quotes or dialogue': 'Citaten of dialoog', 'Questions': 'Vragen', 'Very short sentences (human-like)': 'Zeer korte zinnen (menselijk)',
+    'Evenly sized paragraphs': 'Even lange alinea\'s', 'Uneven paragraph sizes': 'Ongelijke alinealengtes', 'Long, dense sentences (human-like)': 'Lange, dichte zinnen (menselijk)',
+    'Generic vocabulary, few specialist terms': 'Algemene woordenschat, weinig vaktermen', 'Specialist or technical vocabulary': 'Vak- of technische woordenschat',
+  },
+};
+const CATS_I18N = {
+  en: [
+    ['Zero-width characters', 'U+200B, U+200C, U+200D, U+2060, U+FEFF, U+180E. Invisible and take up no space.', 'Can be inserted as hidden marks or for tracking. Some editors and copy-paste also leave them.'],
+    ['Unusual spaces', 'Narrow no-break space U+202F, thin and hair spaces U+2000–U+200A, U+205F, U+3000.', 'U+202F has been reported in some chatbot output. Also normal in French typography and some editors.'],
+    ['No-break spaces', 'U+00A0.', 'Very common in text copied from web pages and Word. A weak signal on its own, so it does not raise sentence scores.'],
+    ['Direction controls', 'U+200E, U+200F, U+202A–U+202E, U+2066–U+2069, U+061C.', 'Invisibly change text direction. Rare in normal prose; used to hide or reorder text.'],
+    ['Unicode tag characters', 'U+E0000–U+E007F: invisible copies of ASCII letters.', 'Can carry a hidden message inside normal-looking text. Any message found is decoded below.'],
+    ['Variation-selector runs', 'Two or more variation selectors in a row (U+FE00–U+FE0F, U+E0100–U+E01EF).', 'Can hide bytes behind one visible character. A single selector after an emoji is normal and is ignored.'],
+    ['Soft hyphens', 'U+00AD.', 'Invisible unless a line breaks there. Left by some publishing tools.'],
+    ['Look-alike letters', 'Words that mix Latin letters with Cyrillic or Greek ones, such as a Cyrillic "е" inside an English word.', 'Used to fingerprint copies or to slip past filters and detectors.'],
+  ],
+  de: [
+    ['Null-Breite-Zeichen', 'U+200B, U+200C, U+200D, U+2060, U+FEFF, U+180E. Unsichtbar und ohne Breite.', 'Können als versteckte Markierung oder zur Nachverfolgung eingefügt werden. Manche Editoren und Kopiervorgänge hinterlassen sie ebenfalls.'],
+    ['Ungewöhnliche Leerzeichen', 'Schmales geschütztes Leerzeichen U+202F, dünne Leerzeichen U+2000–U+200A, U+205F, U+3000.', 'U+202F wurde in manchen Chatbot-Ausgaben beobachtet. Im Französischen und in manchen Editoren aber auch normal.'],
+    ['Geschützte Leerzeichen', 'U+00A0.', 'Sehr häufig in Text aus Webseiten und Word. Allein ein schwaches Signal, daher ohne Einfluss auf die Satzbewertung.'],
+    ['Richtungssteuerzeichen', 'U+200E, U+200F, U+202A–U+202E, U+2066–U+2069, U+061C.', 'Ändern unsichtbar die Schreibrichtung. In normalem Text selten; werden genutzt, um Text zu verstecken oder umzuordnen.'],
+    ['Unicode-Tag-Zeichen', 'U+E0000–U+E007F: unsichtbare Kopien von ASCII-Buchstaben.', 'Können eine versteckte Nachricht in normal aussehendem Text tragen. Gefundene Nachrichten werden unten entschlüsselt.'],
+    ['Folgen von Variationsselektoren', 'Zwei oder mehr Variationsselektoren hintereinander (U+FE00–U+FE0F, U+E0100–U+E01EF).', 'Können Daten hinter einem sichtbaren Zeichen verstecken. Ein einzelner Selektor nach einem Emoji ist normal und wird ignoriert.'],
+    ['Weiche Trennstriche', 'U+00AD.', 'Unsichtbar, außer am Zeilenumbruch. Werden von manchen Publishing-Werkzeugen hinterlassen.'],
+    ['Ähnlich aussehende Buchstaben', 'Wörter, die lateinische mit kyrillischen oder griechischen Buchstaben mischen, z. B. ein kyrillisches „е“ in einem deutschen Wort.', 'Werden genutzt, um Kopien zu markieren oder Filter und Detektoren zu umgehen.'],
+  ],
+  nl: [
+    ['Tekens zonder breedte', 'U+200B, U+200C, U+200D, U+2060, U+FEFF, U+180E. Onzichtbaar en zonder breedte.', 'Kunnen als verborgen markering of om te volgen worden ingevoegd. Sommige editors en kopieeracties laten ze ook achter.'],
+    ['Ongewone spaties', 'Smalle vaste spatie U+202F, dunne spaties U+2000–U+200A, U+205F, U+3000.', 'U+202F is in sommige chatbot-uitvoer gezien. Ook normaal in Franse typografie en sommige editors.'],
+    ['Vaste spaties', 'U+00A0.', 'Heel gewoon in tekst uit webpagina\'s en Word. Op zichzelf een zwak signaal, dus zonder invloed op de zinsscores.'],
+    ['Richtingstekens', 'U+200E, U+200F, U+202A–U+202E, U+2066–U+2069, U+061C.', 'Veranderen onzichtbaar de leesrichting. Zeldzaam in gewone tekst; worden gebruikt om tekst te verbergen of te herschikken.'],
+    ['Unicode-tagtekens', 'U+E0000–U+E007F: onzichtbare kopieën van ASCII-letters.', 'Kunnen een verborgen bericht in normaal ogende tekst bevatten. Gevonden berichten worden hieronder ontcijferd.'],
+    ['Reeksen variatieselectoren', 'Twee of meer variatieselectoren achter elkaar (U+FE00–U+FE0F, U+E0100–U+E01EF).', 'Kunnen gegevens achter één zichtbaar teken verbergen. Eén selector na een emoji is normaal en wordt genegeerd.'],
+    ['Zachte afbreekstreepjes', 'U+00AD.', 'Onzichtbaar, behalve bij een regelafbreking. Achtergelaten door sommige publicatieprogramma\'s.'],
+    ['Lookalike-letters', 'Woorden die Latijnse letters mengen met Cyrillische of Griekse, zoals een Cyrillische "е" in een Nederlands woord.', 'Worden gebruikt om kopieën te markeren of filters en detectoren te omzeilen.'],
+  ],
+};
+
+let lang = 'en';
+try { const s = localStorage.getItem('tp-lang'); if (s && I18N[s]) lang = s; else { const n = (navigator.language || '').slice(0, 2).toLowerCase(); if (I18N[n]) lang = n; } } catch (e) {}
+function t(key, vars){
+  let s = (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+  if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+  return s;
+}
+const tr = name => (lang !== 'en' && SIG[lang] && SIG[lang][name]) || name;
+const fmt = v => Number(v).toLocaleString(LOCALE[lang]);
+
+function applyStatic(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+  document.querySelectorAll('.langsw button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+  updCount();
+}
+function setLang(l){
+  if (!I18N[l] || l === lang) return;
+  const wasSample = ta.value === buildSample(lang);
+  lang = l;
+  try { localStorage.setItem('tp-lang', l); } catch (e) {}
+  applyStatic();
+  if (wasSample){ ta.value = buildSample(lang); updCount(); run(); return; }
+  if (R){
+    renderSummary(); renderTop(); renderHidden(); goPage(page, true);
+    $('maplen').textContent = t('charsN', { n: fmt(text.length) });
+    if (sel >= 0) renderDetail(sel); else $('detail').innerHTML = '<p class="note">' + esc(t('clickHint')) + '</p>';
+    setStatus(t('stChecked', { n: fmt(text.length), t: msText(R.ms) }));
+  }
+}
 
 const HID_RE = /[&<>]|(?:\uDB40[\uDC00-\uDC7F])+|(?:[︀-️]|\uDB40[\uDD00-\uDDEF]){2,}|[︀-︎]|\uDB40[\uDD00-\uDDEF]|[​-‏⁠-⁤﻿᠎­‪-‮⁦-⁩؜   -  　]/g;
 const LABEL = { 0x200B:['ZWSP','Zero-width space U+200B'], 0x200C:['ZWNJ','Zero-width non-joiner U+200C'], 0x200D:['ZWJ','Zero-width joiner U+200D'], 0x200E:['LRM','Left-to-right mark U+200E'], 0x200F:['RLM','Right-to-left mark U+200F'], 0x2060:['WJ','Word joiner U+2060'], 0xFEFF:['BOM','Zero-width no-break space U+FEFF'], 0x180E:['MVS','Mongolian vowel separator U+180E'], 0x00AD:['SHY','Soft hyphen U+00AD'], 0x00A0:['NBSP','No-break space U+00A0'], 0x202F:['NNBSP','Narrow no-break space U+202F'], 0x205F:['MMSP','Medium math space U+205F'], 0x3000:['IDSP','Ideographic space U+3000'], 0x061C:['ALM','Arabic letter mark U+061C'] };
 const hex = c => 'U+' + c.toString(16).toUpperCase().padStart(4, '0');
-function esc(s){ return s.replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]); }
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]); }
 function pill(lab, title, soft){ return '<span class="hid' + (soft ? ' soft' : '') + '" title="' + esc(title) + '">' + esc(lab) + '</span>'; }
 function renderText(s){
   return s.replace(HID_RE, (m, off, str) => {
@@ -743,7 +1067,7 @@ function renderText(s){
       const d = m.charCodeAt(1);
       if (d >= 0xDC00 && d <= 0xDC7F){
         let msg = ''; for (let k = 0; k < m.length; k += 2){ const cp = m.charCodeAt(k + 1) - 0xDC00; if (cp >= 0x20 && cp <= 0x7E) msg += String.fromCharCode(cp); }
-        return pill('TAG×' + (m.length / 2), 'Hidden tag characters' + (msg ? ': "' + msg.slice(0, 200) + '"' : ''));
+        return pill('TAG×' + (m.length / 2), 'Unicode tag characters' + (msg ? ': "' + msg.slice(0, 200) + '"' : ''));
       }
       const k = Array.from(m).length;
       return pill(k > 1 ? 'VS×' + k : 'VS', 'Variation selector(s)');
@@ -760,8 +1084,8 @@ function renderText(s){
 }
 
 const HG_MAP = {'а':'a','е':'e','о':'o','р':'p','с':'c','у':'y','х':'x','і':'i','ј':'j','ѕ':'s','ԁ':'d','А':'A','В':'B','Е':'E','К':'K','М':'M','Н':'H','О':'O','Р':'P','С':'C','Т':'T','Х':'X','У':'Y','І':'I','Ј':'J','Ѕ':'S','ο':'o','α':'a','ν':'v','ρ':'p','τ':'t','Ο':'O','Α':'A','Β':'B','Ε':'E','Ζ':'Z','Η':'H','Ι':'I','Κ':'K','Μ':'M','Ν':'N','Ρ':'P','Τ':'T','Χ':'X','Υ':'Y'};
-function clean(t){
-  return t
+function clean(s){
+  return s
     .replace(/(?:\uDB40[\uDC00-\uDC7F])+/g, '')
     .replace(/(?:[︀-️]|\uDB40[\uDD00-\uDDEF]){2,}/g, '')
     .replace(/[︀-︎]|\uDB40[\uDD00-\uDDEF]/g, '')
@@ -775,7 +1099,8 @@ function clean(t){
 }
 
 function setStatus(msg, err){ statusEl.textContent = msg; statusEl.classList.toggle('err', !!err); }
-function updCount(){ $('count').textContent = fmt(ta.value.length) + ' / 5,000,000 characters'; }
+function updCount(){ $('count').textContent = t('count', { n: fmt(ta.value.length), max: fmt(MAX) }); }
+const msText = ms => ms < 1000 ? ms + ' ms' : (ms / 1000).toLocaleString(LOCALE[lang], { maximumFractionDigits: 1 }) + ' s';
 
 // loading bar
 const prog = $('prog'), progFill = $('progfill'), progPct = $('progpct'), progLab = $('proglab');
@@ -783,7 +1108,7 @@ let progShown = 0, progHide = 0;
 function progStart(){
   clearTimeout(progHide);
   prog.hidden = false; prog.classList.remove('done');
-  progShown = Date.now(); progSet(0, 'Reading the text…');
+  progShown = Date.now(); progSet(0, t('pReading'));
   document.body.classList.add('busy');
 }
 function progSet(pct, label){
@@ -794,19 +1119,19 @@ function progSet(pct, label){
   if (label) progLab.textContent = label;
 }
 function progLabel(pct){
-  return pct < 60 ? 'Measuring each sentence…' : pct < 76 ? 'Scanning for hidden characters…' : pct < 95 ? 'Scoring passages…' : 'Finishing up…';
+  return t(pct < 60 ? 'pMeasure' : pct < 76 ? 'pHidden' : pct < 95 ? 'pScore' : 'pFinish');
 }
 function progEnd(ok){
   const wait = Math.max(0, 450 - (Date.now() - progShown));
   return new Promise(res => setTimeout(() => {
-    progSet(100, ok ? 'Done' : 'Stopped');
+    progSet(100, t(ok ? 'pDone' : 'pStopped'));
     prog.classList.add('done');
     document.body.classList.remove('busy');
     progHide = setTimeout(() => { prog.hidden = true; }, 900);
     res();
   }, wait));
 }
-function setBusy(b){ $('run').disabled = b; $('run').textContent = b ? 'Analyzing…' : 'Analyze'; }
+function setBusy(b){ $('run').disabled = b; $('run').textContent = t(b ? 'analyzing' : 'analyze'); }
 
 function makeWorker(){
   const url = URL.createObjectURL(new Blob([$('worker-src').textContent], { type: 'text/javascript' }));
@@ -816,22 +1141,22 @@ function makeWorker(){
 }
 
 function run(){
-  let t = ta.value;
-  if (!t.trim()){ setStatus('Paste text or upload a file first.', true); return; }
-  if (t.length > MAX) t = t.slice(0, MAX);
+  let src = ta.value;
+  if (!src.trim()){ setStatus(t('stEmpty'), true); return; }
+  if (src.length > MAX) src = src.slice(0, MAX);
   if (wk) wk.terminate();
-  try { wk = makeWorker(); } catch (e) { setStatus('Your browser blocked the analyzer: ' + e.message, true); return; }
+  try { wk = makeWorker(); } catch (e) { setStatus(t('stBlocked', { e: e.message }), true); return; }
   const id = ++runId, me = wk;
   setBusy(true); setStatus(''); progStart();
   me.onmessage = ev => {
     if (id !== runId) return;
     const m = ev.data;
     if (m.type === 'progress') progSet(m.pct, progLabel(m.pct));
-    else if (m.type === 'done'){ me.terminate(); if (wk === me) wk = null; const r = m.r; progEnd(true).then(() => { if (id !== runId) return; setBusy(false); text = t; show(r); }); }
-    else if (m.type === 'error'){ progEnd(false).then(() => { if (id !== runId) return; setBusy(false); setStatus('Analysis failed: ' + m.message, true); }); }
+    else if (m.type === 'done'){ me.terminate(); if (wk === me) wk = null; const r = m.r; progEnd(true).then(() => { if (id !== runId) return; setBusy(false); text = src; show(r); }); }
+    else if (m.type === 'error'){ progEnd(false).then(() => { if (id !== runId) return; setBusy(false); setStatus(t('stFailed', { e: m.message }), true); }); }
   };
-  me.onerror = e => { if (id !== runId) return; progEnd(false).then(() => { if (id !== runId) return; setBusy(false); setStatus('Analysis failed: ' + (e.message || 'background worker error'), true); }); };
-  wk.postMessage({ text: t });
+  me.onerror = e => { if (id !== runId) return; progEnd(false).then(() => { if (id !== runId) return; setBusy(false); setStatus(t('stFailed', { e: e.message || 'worker error' }), true); }); };
+  wk.postMessage({ text: src });
 }
 
 function endOf(i){ return i + 1 < S ? R.starts[i + 1] : text.length; }
@@ -844,18 +1169,13 @@ function show(r){
   pageStarts = [0]; let acc = 0;
   for (let i = 0; i < S; i++){ const len = endOf(i) - r.starts[i]; if (acc > 0 && acc + len > PAGE_CHARS){ pageStarts.push(i); acc = 0; } acc += len; }
   renderSummary(); renderTop(); renderHidden();
-  $('detail').innerHTML = '<p class="note">Click any sentence in the document to see what raised or lowered its score.</p>';
-  $('maplen').textContent = fmt(text.length) + ' characters';
+  $('detail').innerHTML = '<p class="note">' + esc(t('clickHint')) + '</p>';
+  $('maplen').textContent = t('charsN', { n: fmt(text.length) });
   goPage(0, false); drawMap();
-  setStatus('Checked ' + fmt(text.length) + ' characters in ' + (r.ms < 1000 ? r.ms + ' ms' : (r.ms / 1000).toFixed(1) + ' s') + '.');
+  setStatus(t('stChecked', { n: fmt(text.length), t: msText(r.ms) }));
 }
 
-function verdict(share){
-  if (share < 0.1) return 'Mostly human-style';
-  if (share < 0.4) return 'Mixed: some AI-style passages';
-  if (share < 0.75) return 'Largely AI-style';
-  return 'Strongly AI-style throughout';
-}
+function verdict(share){ return t(share < 0.1 ? 'v1' : share < 0.4 ? 'v2' : share < 0.75 ? 'v3' : 'v4'); }
 function renderSummary(){
   const st = R.stats, share = st.scored ? st.aiC / st.scored : 0, mix = st.scored ? st.mixC / st.scored : 0;
   const hidTotal = R.hidden.counts.reduce((a, b, k) => a + (k === 2 ? 0 : b), 0);
@@ -866,18 +1186,19 @@ function renderSummary(){
       '<circle cx="70" cy="70" r="52" class="rtrack"/>' +
       (mixLen > 0.5 ? '<circle cx="70" cy="70" r="52" class="rmix" stroke-dasharray="' + mixLen.toFixed(1) + ' ' + C.toFixed(1) + '" stroke-dashoffset="' + (-aiLen).toFixed(1) + '"/>' : '') +
       (aiLen > 0.5 ? '<circle cx="70" cy="70" r="52" class="rai" stroke="url(#rg-ai)" stroke-dasharray="' + aiLen.toFixed(1) + ' ' + C.toFixed(1) + '"/>' : '') +
-    '</svg><div class="ringnum"><div class="big">' + Math.round(share * 100) + '<span>%</span></div><div class="ringlab">AI-style</div></div></div>' +
-    '<p class="verdict">' + verdict(share) + '</p>' +
+    '</svg><div class="ringnum"><div class="big">' + Math.round(share * 100) + '<span>%</span></div><div class="ringlab">' + esc(t('ringLab')) + '</div></div></div>' +
+    '<p class="verdict">' + esc(verdict(share)) + '</p>' +
     '<dl class="kv">' +
-      '<dt>AI-style sentences</dt><dd>' + fmt(st.aiN) + '</dd>' +
-      '<dt>Mixed sentences</dt><dd>' + fmt(st.mixN) + '</dd>' +
-      '<dt>All sentences</dt><dd>' + fmt(st.sentences) + '</dd>' +
-      '<dt>Average sentence score</dt><dd>' + Math.round(st.mean * 100) + '%</dd>' +
-      '<dt>Words</dt><dd>' + fmt(st.words) + '</dd>' +
-      '<dt>Em dashes</dt><dd>' + fmt(st.emdash) + '</dd>' +
-      '<dt>Hidden characters</dt><dd>' + fmt(hidTotal) + '</dd>' +
+      '<dt>' + esc(t('kvLang')) + '</dt><dd>' + esc(t('lang_' + (R.lang || 'en'))) + '</dd>' +
+      '<dt>' + esc(t('kvAi')) + '</dt><dd>' + fmt(st.aiN) + '</dd>' +
+      '<dt>' + esc(t('kvMix')) + '</dt><dd>' + fmt(st.mixN) + '</dd>' +
+      '<dt>' + esc(t('kvAll')) + '</dt><dd>' + fmt(st.sentences) + '</dd>' +
+      '<dt>' + esc(t('kvAvg')) + '</dt><dd>' + Math.round(st.mean * 100) + '%</dd>' +
+      '<dt>' + esc(t('kvWords')) + '</dt><dd>' + fmt(st.words) + '</dd>' +
+      '<dt>' + esc(t('kvDash')) + '</dt><dd>' + fmt(st.emdash) + '</dd>' +
+      '<dt>' + esc(t('kvHid')) + '</dt><dd>' + fmt(hidTotal) + '</dd>' +
     '</dl>' +
-    (st.words < 80 ? '<p class="note">Under 80 words is too short for a reliable reading.</p>' : '');
+    (st.words < 80 ? '<p class="note">' + esc(t('tooShort')) + '</p>' : '');
 }
 function renderTop(){
   const items = [];
@@ -885,26 +1206,25 @@ function renderTop(){
   R.freqAi.forEach((c, id) => { if (c > 0) items.push([c, R.names[id], 'sentences']); });
   items.sort((a, b) => b[0] - a[0]);
   $('top').innerHTML = items.length
-    ? '<p class="note" style="margin:0 0 8px">What pushed AI-style passages over the line.</p><ol class="top">' + items.slice(0, 10).map(x => '<li><span>' + esc(x[1]) + '</span><b>' + fmt(x[0]) + ' ' + x[2] + '</b></li>').join('') + '</ol>'
-    : '<p class="note">No AI-style passages found.</p>';
+    ? '<p class="note" style="margin:0 0 8px">' + esc(t('topIntro')) + '</p><ol class="top">' + items.slice(0, 10).map(x => '<li><span>' + esc(tr(x[1])) + '</span><b>' + fmt(x[0]) + ' ' + esc(t(x[2])) + '</b></li>').join('') + '</ol>'
+    : '<p class="note">' + esc(t('noAiPassages')) + '</p>';
 }
 function renderHidden(){
-  const h = R.hidden;
+  const h = R.hidden, cats = CATS_I18N[lang] || CATS_I18N.en;
   let html = '<table class="hm"><tbody>';
-  CATS.forEach((c, k) => {
+  cats.forEach((c, k) => {
     const n = h.counts[k];
-    html += '<tr class="' + (n ? '' : 'zero') + '"><td><span class="nm">' + esc(c.name) + '</span><span class="ds">' + esc(c.what) + ' ' + esc(c.why) + '</span>' +
-      (n ? ' <button class="linkbtn" data-pos="' + h.first[k] + '">Show first</button>' : '') + '</td><td class="n">' + fmt(n) + '</td></tr>';
+    html += '<tr class="' + (n ? '' : 'zero') + '"><td><span class="nm">' + esc(c[0]) + '</span><span class="ds">' + esc(c[1]) + ' ' + esc(c[2]) + '</span>' +
+      (n ? ' <button class="linkbtn" data-pos="' + h.first[k] + '">' + esc(t('showFirst')) + '</button>' : '') + '</td><td class="n">' + fmt(n) + '</td></tr>';
   });
   html += '</tbody></table>';
   if (h.decoded.length){
-    html += '<div class="decoded">' + h.decoded.slice(0, 10).map(d => '<div><b>Hidden message · ' + esc(d.kind) + ' · at character ' + fmt(d.pos) + '</b>' + esc(d.text) + '</div>').join('') + '</div>';
+    html += '<div class="decoded">' + h.decoded.slice(0, 10).map(d => '<div><b>' + esc(t('hiddenMsg', { kind: t(d.kind === 'Tag characters' ? 'kTag' : 'kVs'), pos: fmt(d.pos) })) + '</b>' + esc(d.text) + '</div>').join('') + '</div>';
   }
   if (h.hgWords.length){
-    html += '<p class="note">Look-alike words: ' + h.hgWords.slice(0, 8).map(w => '<button class="linkbtn" data-pos="' + w.pos + '">' + esc(w.word) + '</button>').join(', ') + '</p>';
+    html += '<p class="note">' + esc(t('lookalike')) + ' ' + h.hgWords.slice(0, 8).map(w => '<button class="linkbtn" data-pos="' + w.pos + '">' + esc(w.word) + '</button>').join(', ') + '</p>';
   }
-  const any = h.counts.some(Boolean);
-  html += '<p class="note">' + (any ? 'Hidden characters show the text went through some tool or editor. They don\'t prove an AI wrote it.' : 'No hidden characters found. Missing marks don\'t prove a human wrote it.') + '</p>';
+  html += '<p class="note">' + esc(t(h.counts.some(Boolean) ? 'hidAny' : 'hidNone')) + '</p>';
   $('hidden').innerHTML = html;
 }
 
@@ -919,7 +1239,7 @@ function goPage(pg, keepScroll){
   }
   doc.innerHTML = parts.join('');
   if (!keepScroll) doc.scrollTop = 0;
-  $('pinfo').textContent = 'Page ' + fmt(page + 1) + ' of ' + fmt(pageStarts.length) + ' · sentences ' + fmt(a + 1) + '–' + fmt(b);
+  $('pinfo').textContent = t('pinfo', { p: fmt(page + 1), n: fmt(pageStarts.length), a: fmt(a + 1), b: fmt(b) });
   $('prev').disabled = page === 0; $('next').disabled = page >= pageStarts.length - 1;
   drawMap();
 }
@@ -940,8 +1260,9 @@ function focusSentence(i){
 function wfmt(w){ return '<span class="w ' + (w > 0 ? 'pos' : 'neg') + '">' + (w > 0 ? '+' : '−') + Math.abs(w).toFixed(1) + '</span>'; }
 function renderDetail(i){
   const pv = R.p[i], lv = level(pv);
-  if (lv < 0){ $('detail').innerHTML = '<p class="note">This is blank space between sentences.</p>'; return; }
-  const chip = lv === 2 ? '<span class="chip ai">AI-style · ' + Math.round(pv * 100) + '%</span>' : lv === 1 ? '<span class="chip mix">Mixed · ' + Math.round(pv * 100) + '%</span>' : '<span class="chip hu">Human-style · ' + Math.round(pv * 100) + '%</span>';
+  if (lv < 0){ $('detail').innerHTML = '<p class="note">' + esc(t('blank')) + '</p>'; return; }
+  const pct = Math.round(pv * 100) + '%';
+  const chip = lv === 2 ? '<span class="chip ai">' + esc(t('chipAi')) + ' · ' + pct + '</span>' : lv === 1 ? '<span class="chip mix">' + esc(t('chipMix')) + ' · ' + pct + '</span>' : '<span class="chip hu">' + esc(t('chipHu')) + ' · ' + pct + '</span>';
   const s = text.slice(R.starts[i], endOf(i));
   const b = R.blockOf[i], NF = R.feat.length;
   const feats = [];
@@ -953,14 +1274,14 @@ function renderDetail(i){
   feats.sort((x, y) => Math.abs(y[0]) - Math.abs(x[0]));
   const l = R.reasons[i] || [];
   let own = '';
-  for (let q = 0; q < l.length; q += 2) own += '<li>' + wfmt(l[q + 1] * 0.5) + '<span>' + esc(R.names[l[q]]) + '</span></li>';
+  for (let q = 0; q < l.length; q += 2) own += '<li>' + wfmt(l[q + 1] * 0.5) + '<span>' + esc(tr(R.names[l[q]])) + '</span></li>';
   $('detail').innerHTML =
-    '<div class="dhead">' + chip + '<span>Sentence ' + fmt(i + 1) + '</span></div>' +
+    '<div class="dhead">' + chip + '<span>' + esc(t('sentenceN', { n: fmt(i + 1) })) + '</span></div>' +
     '<blockquote>' + renderText(s.length > 600 ? s.slice(0, 600) + '…' : s) + '</blockquote>' +
-    '<p class="sub">This passage · ' + Math.round(R.bp[b] * 100) + '% AI-style</p>' +
-    (feats.length ? '<ul class="why">' + feats.slice(0, 8).map(f => '<li>' + wfmt(f[0]) + '<span>' + esc(f[1]) + '</span></li>').join('') + '</ul>' : '<p class="note" style="margin:0">No strong passage signals either way.</p>') +
-    '<p class="sub">This sentence</p>' +
-    (own ? '<ul class="why">' + own + '</ul>' : '<p class="note" style="margin:0">Nothing specific to this sentence. Its score comes from the passage around it.</p>');
+    '<p class="sub">' + esc(t('thisPassage', { p: Math.round(R.bp[b] * 100) })) + '</p>' +
+    (feats.length ? '<ul class="why">' + feats.slice(0, 8).map(f => '<li>' + wfmt(f[0]) + '<span>' + esc(tr(f[1])) + '</span></li>').join('') + '</ul>' : '<p class="note" style="margin:0">' + esc(t('noPassage')) + '</p>') +
+    '<p class="sub">' + esc(t('thisSentence')) + '</p>' +
+    (own ? '<ul class="why">' + own + '</ul>' : '<p class="note" style="margin:0">' + esc(t('nothingSentence')) + '</p>');
 }
 
 function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
@@ -983,11 +1304,21 @@ function drawMap(){
   ctx.strokeStyle = css('--accent'); ctx.lineWidth = 2 * dpr; ctx.strokeRect(px0 + dpr, dpr, px1 - px0 - 2 * dpr, H - 2 * dpr);
 }
 
-function buildSample(){
+// sample: a human paragraph, an AI-written middle with a hidden tag message, and a human ending
+function buildSample(l){
   const tag = s => Array.from(s).map(ch => String.fromCodePoint(0xE0000 + ch.charCodeAt(0))).join('');
+  const mark = tag('model=demo; id=7f3a');
+  if (l === 'de') return 'Hab das Fahrrad endlich repariert. Hat drei Abende gedauert, vor allem weil ich ständig den 10er-Schlüssel verlegt hab, das ist echt schon ein Naturgesetz. Die Kette war okay. Das Schaltwerk nicht. Keine Ahnung, warum der Laden dafür 90 Euro wollte, war doch nur ein krummes Schaltauge und ein Zug.\n\n' +
+    'Regelmäßige Wartung ist eine der effektivsten Möglichkeiten, die Lebensdauer eines Fahrrads zu verlängern. Ein sauberer, gut geschmierter Antrieb reduziert den Verschleiß von Kette und Kassette und sorgt so für eine gleichmäßigere und effizientere Fahrt. Auch die Kontrolle des Reifendrucks vor jeder Fahrt spielt eine entscheidende Rolle, da zu niedriger Druck den Rollwiderstand und das Risiko von Pannen erhöht.\n\n' +
+    'Darüber hinaus verdienen die Bremsen die gleiche Aufmerksamkeit. Abgenutzte Beläge verringern die Bremskraft schleichend, wodurch die Veränderung leicht übersehen wird. Eine regelmäßige Kontrolle hilft dabei, Probleme frühzeitig zu erkennen — bevor sie zu kostspieligen Reparaturen werden. Zusammenfassend lässt sich sagen, dass eine konsequente Routine das Fahrrad zuverlässig hält und für mehr Sicherheit im Alltag sorgt.' + mark + '\n\n' +
+    'Egal. Nächstes Wochenende: Bremsen. Drückt mir die Daumen haha';
+  if (l === 'nl') return 'Eindelijk de fiets gemaakt. Kostte me drie avonden, vooral omdat ik steeds die 10mm-sleutel kwijtraakte, dat is gewoon een natuurwet inmiddels. De ketting was prima. De derailleur niet. Geen idee waarom de winkel daar 90 euro voor vroeg, het was gwn een krom pad en een kabeltje.\n\n' +
+    'Regelmatig onderhoud is een van de meest effectieve manieren om de levensduur van een fiets te verlengen. Een schone, goed gesmeerde aandrijving vermindert de slijtage van ketting en cassette, waardoor elke rit soepeler en efficiënter verloopt. Daarnaast speelt het controleren van de bandenspanning een cruciale rol, omdat een te lage spanning de rolweerstand en het risico op lekke banden verhoogt.\n\n' +
+    'Ook de remmen verdienen dezelfde aandacht. Versleten remblokken verminderen de remkracht geleidelijk, waardoor de verandering makkelijk over het hoofd wordt gezien. Door ze regelmatig te controleren, kun je problemen vroegtijdig opsporen — voordat ze tot kostbare reparaties leiden. Kortom, een consequente routine houdt de fiets betrouwbaar en zorgt voor meer zekerheid onderweg.' + mark + '\n\n' +
+    'Nou ja. Volgend weekend: remmen. Duim maar voor me haha';
   return 'Okay so I finally fixed the bike. Took me three evenings, mostly because I kept losing the 10mm wrench, which honestly should be a law of physics by now. The chain was fine. The derailleur was not. idk why the shop quoted me 90 euros for that, it was one bent hanger and a cable.\n\n' +
     'Regular maintenance is one of the most effective ways to extend the life of a bicycle. A clean, well-lubricated drivetrain reduces wear on the chain and cassette, making each ride smoother and more efficient. Checking tire pressure before every ride also matters, since underinflated tires increase rolling resistance and the risk of pinch flats. These small habits add up over time, ensuring the bike stays reliable and safe in a wide range of conditions.\n\n' +
-    'Brakes deserve the same attention. Worn pads reduce stopping power gradually, which makes the change easy to miss until it becomes a real safety issue. Inspecting them every few weeks, along with the cables and levers, helps riders catch problems early — before they turn into costly repairs. In the end, a consistent routine keeps the bike performing at its best and gives riders greater confidence on every journey.' + tag('model=demo; id=7f3a') + '\n\n' +
+    'Brakes deserve the same attention. Worn pads reduce stopping power gradually, which makes the change easy to miss until it becomes a real safety issue. Inspecting them every few weeks, along with the cables and levers, helps riders catch problems early — before they turn into costly repairs. In the end, a consistent routine keeps the bike performing at its best and gives riders greater confidence on every journey.' + mark + '\n\n' +
     'Anyway. Next weekend: brakes. Wish me luck lol';
 }
 
@@ -996,17 +1327,18 @@ ta.addEventListener('input', updCount);
 ta.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ e.preventDefault(); run(); } });
 $('run').addEventListener('click', run);
 $('clear').addEventListener('click', () => { ta.value = ''; updCount(); ta.focus(); });
-$('sample').addEventListener('click', () => { ta.value = buildSample(); updCount(); run(); });
+$('sample').addEventListener('click', () => { ta.value = buildSample(lang); updCount(); run(); });
+document.querySelectorAll('.langsw button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
 $('file').addEventListener('change', async e => {
   const f = e.target.files && e.target.files[0]; if (!f) return;
   try {
-    let t = await f.text();
-    const cut = t.length > MAX;
-    if (cut) t = t.slice(0, MAX);
-    ta.value = t; updCount();
-    setStatus('Loaded ' + f.name + (cut ? ' (cut to the first 5,000,000 characters)' : '') + '.');
+    let s = await f.text();
+    const cut = s.length > MAX;
+    if (cut) s = s.slice(0, MAX);
+    ta.value = s; updCount();
+    setStatus(t(cut ? 'loadedCut' : 'loaded', { f: f.name }));
     run();
-  } catch (err) { setStatus('Could not read ' + f.name + ': ' + err.message, true); }
+  } catch (err) { setStatus(t('readFail', { f: f.name, e: err.message }), true); }
   e.target.value = '';
 });
 doc.addEventListener('click', e => { const el = e.target.closest('.s'); if (el && R) focusSentence(+el.dataset.i); });
@@ -1016,7 +1348,7 @@ $('nextai').addEventListener('click', () => {
   if (!R) return;
   const from = sel >= 0 ? sel + 1 : pageStarts[page];
   for (let k = 0; k < S; k++){ const i = (from + k) % S; if (R.p[i] >= 0.7){ focusSentence(i); return; } }
-  setStatus('No AI-style passages found.');
+  setStatus(t('noAiFound'));
 });
 $('map').addEventListener('click', e => {
   if (!R) return;
@@ -1026,16 +1358,17 @@ $('map').addEventListener('click', e => {
 $('map').addEventListener('keydown', e => { if (!R) return; if (e.key === 'ArrowRight') goPage(page + 1); if (e.key === 'ArrowLeft') goPage(page - 1); });
 document.querySelector('aside').addEventListener('click', e => { const b = e.target.closest('[data-pos]'); if (b && R) focusSentence(sIdx(+b.dataset.pos)); });
 $('copyclean').addEventListener('click', () => {
-  const src = R ? text : ta.value; if (!src){ setStatus('Nothing to clean yet.', true); return; }
+  const src = R ? text : ta.value; if (!src){ setStatus(t('nothingClean'), true); return; }
   const c = clean(src), removed = src.length - c.length;
-  const done = () => setStatus('Copied cleaned text. ' + fmt(removed) + ' hidden characters removed; special spaces and look-alike letters replaced.');
-  const fallback = () => { ta.value = c; updCount(); ta.select(); setStatus('Copying was blocked. The cleaned text is now in the box and selected; press Ctrl+C.'); };
+  const done = () => setStatus(t('copied', { n: fmt(removed) }));
+  const fallback = () => { ta.value = c; updCount(); ta.select(); setStatus(t('copyBlocked')); };
   try { navigator.clipboard.writeText(c).then(done, fallback); } catch (err) { fallback(); }
 });
 $('useclean').addEventListener('click', () => { const src = R ? text : ta.value; if (!src) return; ta.value = clean(src); updCount(); run(); });
 let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(drawMap, 120); });
 
-ta.value = buildSample(); updCount();
+applyStatic();
+ta.value = buildSample(lang); updCount();
 run();
 })();
 </script>
