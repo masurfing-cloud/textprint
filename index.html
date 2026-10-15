@@ -223,8 +223,7 @@ body.busy .doc,body.busy #summary{opacity:.35;transition:opacity .2s}
           <button class="primary" id="run" data-i18n="analyze">Analyze</button>
           <label class="filebtn"><span data-i18n="upload">Upload .txt / .md</span><input type="file" id="file" accept=".txt,.md,.csv,.html,.htm,.json,.srt,.log,text/*"></label>
           <button id="sample" data-i18n="sample">Load sample</button>
-          <button id="clear" data-i18n="clear">Clear</button>
-          <span class="spacer"></span>
+          <button id="clear" data-i18n="clear">Clear</button>          <span class="spacer"></span>
           <span class="count" id="count">0 / 5,000,000 characters</span>
         </div>
         <div class="progress" id="prog" role="progressbar" data-i18n-aria="progAria" aria-label="Analysis progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden>
@@ -253,21 +252,7 @@ body.busy .doc,body.busy #summary{opacity:.35;transition:opacity .2s}
       <section class="panel">
         <details class="how" id="how">
           <summary data-i18n="howTitle">How this works, and what it can't do</summary>
-          <div data-i18n-html="howBody">
-          <p>The text is split into passages of about 100 words. Each passage is measured as a whole, the way detectors like ZeroGPT work, because clean AI writing rarely gives itself away in a single sentence. Each sentence then gets its passage's score, adjusted by anything specific to that sentence.</p>
-          <ul>
-            <li><b>Languages:</b> English, German and Dutch are recognised automatically, each with its own word lists and phrase patterns. Other languages get only the language-neutral checks.</li>
-            <li><b>Style statistics:</b> how evenly sentence lengths run, average word length, how many abstract nouns (-tion, -ment, -ity), trailing "-ing" clauses (", ensuring…"), and how polished the punctuation is.</li>
-            <li><b>Specifics:</b> human writing tends to carry names, places, numbers, a personal "I", asides in parentheses and exclamation marks. Generic text without them leans AI.</li>
-            <li><b>Wording:</b> words and stock phrases that language models overuse ("enhance", "crucial", "delve", "a testament to", "it's important to note").</li>
-            <li><b>Templates:</b> "not just X, but Y", "Whether you're a… or a…", essay-style wrap-ups, formal transitions at the start of sentences.</li>
-            <li><b>Formatting:</b> markdown bold and headings, bullets with bold lead-ins, emoji bullets, frequent em dashes.</li>
-            <li><b>Human signals lower the score:</b> slang, typos, lowercase "i", repeated punctuation, uneven rhythm.</li>
-            <li><b>Hidden characters:</b> zero-width characters, unusual spaces, direction controls, Unicode tag characters and variation-selector runs (which can carry a hidden message, decoded here), and look-alike letters from other alphabets.</li>
-          </ul>
-          <p><b>No detector is 100% accurate, this one included.</b> Formal human writing (legal, academic, corporate) can score high. AI text that someone edited or rewrote can score low. Claude and GPT don't put a detectable watermark in their text, so no tool can prove who wrote something. Hidden characters prove the text passed through some tool or editor, not that an AI wrote it. Use the score as a reason to look closer, never as proof against a person.</p>
-          <p>It doesn't name the model (Claude, GPT, Gemini). Their styles overlap too much to tell apart reliably.</p>
-          </div>
+          <div data-i18n-html="howBody"><p>The text is split into passages of about 100 words. Each passage gets 26 measurements of its style, and a statistical model turns them into a score. Each sentence then gets its passage's score, adjusted by anything specific to that sentence.</p><ul><li><b>Trained, not guessed:</b> the model was fitted with logistic regression on 443 texts: 342 human texts written before 2021 (Wikipedia articles and discussion pages, Hacker News comments, Stack Exchange answers and Mastodon posts, in English, German and Dutch) and 101 AI texts in many genres, from essays and emails to stories, reviews and forum answers.</li><li><b>Measured accuracy:</b> in 5-fold cross-validation, where every text was scored by a model that had never seen it, Textprint marked at least half of the text as AI-style for 81% of the AI texts (English 85%, German 70%, Dutch 80%) and for 3.5% of the human texts. The previous version caught 52% and wrongly flagged 4.1%.</li><li><b>Style:</b> how evenly sentence lengths run, word length, abstract nouns, how varied the vocabulary is, trailing "-ing" clauses (", ensuring…"), how polished the punctuation is, and how evenly sized the paragraphs are.</li><li><b>Specifics:</b> names, numbers, technical terms, asides in parentheses, quotes and questions lean human. Generic text without them leans AI.</li><li><b>Wording:</b> words and stock phrases that language models overuse ("enhance", "crucial", "delve", "a testament to", "it's important to note"), in all three languages.</li><li><b>Formatting:</b> markdown bold and headings, bullets with bold lead-ins, emoji bullets.</li><li><b>Hidden characters:</b> zero-width characters, unusual spaces, direction controls, Unicode tag characters and variation-selector runs (which can carry a hidden message, decoded here), and look-alike letters from other alphabets.</li></ul><p><b>What the numbers don't tell you.</b> The AI test texts come from one model family (Claude). Text from other AI models, AI text that a person edited, and kinds of writing that weren't in the test can score differently, so expect lower accuracy in real use. No detector is 100% accurate, this one included. Claude and GPT don't put a detectable watermark in their text, so no tool can prove who wrote something. Hidden characters prove the text passed through some tool or editor, not that an AI wrote it. Use the score as a reason to look closer, never as proof against a person.</p><p>It doesn't name the model (Claude, GPT, Gemini). Their styles overlap too much to tell apart reliably.</p></div>
         </details>
       </section>
     </main>
@@ -275,8 +260,7 @@ body.busy .doc,body.busy #summary{opacity:.35;transition:opacity .2s}
     <aside class="col">
       <section class="panel" aria-labelledby="sum-h">
         <p class="eyebrow" id="sum-h" data-i18n="reading">Reading</p>
-        <div id="summary"><p class="note" data-i18n="runFirst">Run an analysis to see the score.</p></div>
-        <p class="honest" data-i18n="honest">These are AI-style signals, not proof. See "How this works" below the document.</p>
+        <div id="summary"><p class="note" data-i18n="runFirst">Run an analysis to see the score.</p></div>        <p class="honest" data-i18n="honest">These are AI-style signals, not proof. See "How this works" below the document.</p>
       </section>
       <section class="panel" aria-labelledby="det-h">
         <p class="eyebrow" id="det-h" data-i18n="whyTitle">Why this sentence</p>
@@ -458,32 +442,41 @@ function detectLang(text){
   return best;
 }
 
-// passage-level features: [key, label when it pushes toward AI, label when it pushes toward human]
+// passage-level measurements: [key, label when above average, label when below average]
 const FEAT = [
-  ['lex', 'AI-favored vocabulary', 'Little AI-favored vocabulary'],
+  ['lex', 'Lots of AI-favored vocabulary', 'Little AI-favored vocabulary'],
   ['ing', 'Trailing "-ing" clauses (", ensuring…", ", making…")', ''],
-  ['burst', 'Even sentence lengths (low burstiness)', 'Varied sentence lengths (human-like)'],
+  ['burst', 'Even sentence lengths (low burstiness)', 'Varied sentence lengths'],
   ['awl', 'Long words on average', 'Short, plain words'],
   ['nom', 'Many abstract nouns (-tion, -ment, -ity)', 'Few abstract nouns'],
-  ['fp', '', 'Personal voice (I, me, my)'],
-  ['excl', '', 'Exclamation marks'],
-  ['dig', '', 'Specific numbers, dates and technical terms'],
-  ['pn', 'Generic, few names or places', 'Names, places and proper nouns'],
-  ['paren', '', 'Parenthetical asides'],
+  ['fp', 'Personal voice (I, me, my)', ''],
+  ['excl', 'Exclamation marks', ''],
+  ['dig', 'Specific numbers, dates and technical terms', 'Few numbers or technical terms'],
+  ['pn', 'Names, places and proper nouns', 'Generic, few names or places'],
+  ['paren', 'Parenthetical asides', ''],
   ['this', 'Sentences opening with "This/These…"', ''],
   ['dash', 'Em dashes', ''],
   ['phrase', 'AI stock phrases and formatting', ''],
   ['human', '', 'Slang, typos or casual punctuation'],
-  ['punct', 'Polished punctuation and capitalization', 'Loose punctuation or capitalization'],
-  ['quote', '', 'Quotes or dialogue'],
-  ['quest', '', 'Questions'],
-  ['short', '', 'Very short sentences (human-like)'],
+  ['punct', 'Loose punctuation or capitalization', 'Polished punctuation and capitalization'],
+  ['quote', 'Quotes or dialogue', ''],
+  ['quest', 'Questions', ''],
+  ['short', 'Very short sentences', ''],
   ['para', 'Evenly sized paragraphs', 'Uneven paragraph sizes'],
-  ['slen', '', 'Long, dense sentences (human-like)'],
-  ['spec', 'Generic vocabulary, few specialist terms', 'Specialist or technical vocabulary'],
+  ['slen', 'Long, dense sentences', ''],
+  ['spec', 'Specialist or technical vocabulary', 'Generic vocabulary, few specialist terms'],
+  ['ttr', 'Varied vocabulary, few repeated words', 'Repeats the same words'],
+  ['comma', 'Many commas per sentence', 'Few commas per sentence'],
+  ['mlen', 'Longer sentences on average', 'Short sentences on average'],
+  ['de', '', ''],
+  ['nl', '', ''],
 ];
 const NF = FEAT.length;
-const BIAS = 0.2;
+// learned by logistic regression on 443 calibration texts (5-fold cross-validated): score = BIAS + sum of W[k] * (x[k] - MEAN[k]).
+// "I", "!" and em dashes are held at zero: the calibration set over- or under-represents them compared with real use.
+let W = [0.6657, 15.35, 3.786, -0.2052, -0.05096, 0, 0, -0.3914, -0.1097, -2.172, -10.81, 0, 8.139, 18.29, -7.708, -1.638, -6.58, -2.137, 7.614, -0.4865, 1.052, 20.9, 0.3975, -2.963, -1.203, 0.639];
+let MEAN = [0.334, 0.005672, 0.01538, -0.1861, -1.315, 0, 0, 2.717, 3.37, 0.7061, 0.02544, 0, 0.0352, -0.01066, 0.06115, 0.07319, 0.04022, 0.07448, -0.0007388, 0.2822, -0.00385, 0.1022, 0.8368, -0.1353, 0.2611, 0.2425];
+let BIAS = -3.798;
 
 function segment(text){
   const n = text.length, starts = [0];
@@ -512,8 +505,9 @@ function segment(text){
 
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const sig = z => 1 / (1 + Math.exp(-z));
-// calibrated on held-out human and AI samples: z 0.55 -> 70% (AI-style), z 0 -> 45% (mixed)
-const prob = z => sig(1.9 * z - 0.2);
+// the passage score is already a log-odds; this maps it to a probability
+let PSCALE = 1, PSHIFT = 0;
+const prob = z => sig(PSCALE * z + PSHIFT);
 
 function analyze(text, progress){
   const t0 = Date.now();
@@ -526,7 +520,7 @@ function analyze(text, progress){
   const RULESL = cfg.rules, LEXL = cfg.lex, INGL = cfg.ing, NOML = cfg.nom, FPL = cfg.fp;
 
   // per-sentence measurements
-  const K = 24; // stats per sentence (17 quotes, 18 questions, 19 very short, 20 words counted for length, 21 long words, 22 specialist long words, 23 words counted for rhythm)
+  const K = 25; // stats per sentence (17 quotes, 18 questions, 19 very short, 20 words counted for length, 21 long words, 22 specialist long words, 23 words counted for rhythm, 24 commas)
   const st = new Float32Array(S * K);
   // 0 words,1 lex,2 ing,3 letters,4 nom,5 fp,6 excl,7 digits,8 pn,9 paren,10 thisStart,11 dash,12 rulePos,13 ruleNeg,14 latin,15 sloppy,16 paraEnd
   const rsum = new Float32Array(S);
@@ -583,6 +577,7 @@ function analyze(text, progress){
     const frag = (toks.length <= 5 && !/[.!?…]["'”’)\]]*$/.test(trimmed)) || (toks.length <= 7 && /,$/.test(trimmed));
     st[o + 19] = !frag && toks.length > 0 && toks.length < 6 && !/^\s*(?:[-*•#]|\d+\.)/.test(s) ? 1 : 0;
     st[o + 23] = frag ? 0 : toks.length;
+    st[o + 24] = frag ? 0 : (s.match(/,/g) || []).length;
     let pos = 0, neg = 0; const list = [];
     for (let r = 0; r < RULESL.length; r++){
       const rule = RULESL[r];
@@ -726,51 +721,66 @@ function analyze(text, progress){
       paraC = clamp(2 * (0.4 - cv), -1, 0.6);
     }
   }
+  // lexical variety per passage: moving-window type/token ratio over 40 words
+  const bttr = new Float32Array(B);
+  for (let b = 0; b < B; b++){
+    const a = starts[bStart[b]], e = b + 1 < B ? starts[bStart[b + 1]] : n;
+    const tk = (text.slice(a, e).toLowerCase().match(/[a-zà-öø-ÿ][a-zà-öø-ÿ'’-]*/g) || []);
+    if (tk.length < 40){ bttr[b] = NaN; continue; }
+    let sum = 0, cnt = 0;
+    for (let s0 = 0; s0 + 40 <= tk.length; s0 += 10){ sum += new Set(tk.slice(s0, s0 + 40)).size / 40; cnt++; }
+    bttr[b] = sum / cnt;
+  }
   // score each block from its own sums plus its neighbours' (window of 3 passages)
-  const bz = new Float32Array(B), bc = new Float32Array(B * NF);
+  const bz = new Float32Array(B), bc = new Float32Array(B * NF), bx = new Float32Array(B * NF), bW = new Float32Array(B);
   const win = new Float64Array(BK);
   for (let b = 0; b < B; b++){
     win.fill(0);
+    let ttrS = 0, ttrN = 0;
     for (let q = Math.max(0, b - 1); q <= Math.min(B - 1, b + 1); q++){
       const wgt = q === b ? 1 : 0.5, o = q * BK;
       for (let k = 0; k < BK; k++) win[k] += bs[o + k] * wgt;
+      if (!isNaN(bttr[q])){ ttrS += bttr[q] * wgt; ttrN += wgt; }
     }
-    const W = win[0], Sn = win[K], latin = win[14] / Math.max(1, Sn);
-    const c = bc.subarray(b * NF, b * NF + NF);
-    if (W < 3 || latin < 0.5){ bz[b] = BIAS; continue; }
-    const per100 = x => x / W * 100;
-    c[0] = 0.42 * Math.min(per100(win[1]), 10) - 0.5;
-    c[1] = 3 * Math.min(win[2] / Sn, 0.6);
+    const Wd = win[0], Sn = win[K], latin = win[14] / Math.max(1, Sn);
+    bW[b] = Wd;
+    const x = bx.subarray(b * NF, b * NF + NF), c = bc.subarray(b * NF, b * NF + NF);
+    if (Wd < 3 || latin < 0.5){ bz[b] = BIAS; for (let k = 0; k < NF; k++) x[k] = MEAN[k]; continue; }
+    const per100 = v => v / Wd * 100;
     const Rn = win[K + 2];
-    if (Rn >= 4){
-      const mean = win[23] / Rn, cv = Math.sqrt(Math.max(0, win[K + 1] / Rn - mean * mean)) / mean;
-      c[2] = clamp(3.4 * (0.5 - cv), -1.5, 1.1);
-    }
-    if (Rn > 0) c[19] = clamp(-0.13 * (win[23] / Rn - 26), -1.6, 0);
-    c[3] = clamp(1.2 * (win[3] / Math.max(1, win[20]) - cfg.awl), -1, 1);
-    if (cfg.spec && win[21] >= 4) c[20] = clamp(-2.5 * (win[22] / win[21] - 0.5), -1, 0.5);
-    c[4] = clamp(0.15 * (per100(win[4]) - cfg.nomBase), -0.6, 0.8);
-    c[5] = -0.12 * Math.min(per100(win[5]), 8);
-    c[6] = -1.6 * Math.min(win[6] / Sn, 0.5);
-    c[7] = -0.16 * Math.min(per100(win[7]), 8);
-    c[8] = cfg.pn ? 0.35 - 0.17 * Math.min(per100(win[8]), 10) : 0;
-    c[9] = -0.3 * Math.min(per100(win[9]), 3);
-    c[10] = 1.5 * Math.min(win[10] / Sn, 0.5);
-    c[11] = 0.8 * Math.min(win[11] / Sn, 1);
-    c[12] = 0.9 * win[12] / Sn;
-    c[13] = 1.0 * win[13] / Sn;
-    c[14] = 0.3 - 1.4 * Math.min(win[15] / Sn, 1);
-    c[15] = -1.4 * Math.min(win[17] / Sn, 0.6);
-    c[16] = -2.2 * Math.min(win[18] / Sn, 0.4);
-    c[17] = -2.4 * Math.min(win[19] / Sn, 0.4);
-    c[18] = paraC;
-    // signals based on something being absent (no names, tidy punctuation, no jargon) need a longer sample
-    const absent = Math.min(1, W / 90);
-    for (const k of [8, 14, 20]) if (c[k] > 0) c[k] *= absent;
+    let cv = 0, mean = 0;
+    if (Rn > 0){ mean = win[23] / Rn; cv = Math.sqrt(Math.max(0, win[K + 1] / Rn - mean * mean)) / Math.max(1, mean); }
+    x[0] = Math.min(per100(win[1]), 10);
+    x[1] = Math.min(win[2] / Sn, 0.6);
+    x[2] = Rn >= 4 ? clamp(0.5 - cv, -0.45, 0.33) : MEAN[2];
+    x[3] = clamp(win[3] / Math.max(1, win[20]) - cfg.awl, -0.85, 0.85);
+    x[4] = clamp(per100(win[4]) - cfg.nomBase, -4, 5.3);
+    x[5] = Math.min(per100(win[5]), 8);
+    x[6] = Math.min(win[6] / Sn, 0.5);
+    x[7] = Math.min(per100(win[7]), 8);
+    x[8] = cfg.pn ? Math.min(per100(win[8]), 10) : 0;
+    x[9] = Math.min(per100(win[9]), 3);
+    x[10] = Math.min(win[10] / Sn, 0.5);
+    x[11] = Math.min(win[11] / Sn, 1);
+    x[12] = Math.min(win[12] / Sn, 4);
+    x[13] = Math.max(win[13] / Sn, -3);
+    x[14] = Math.min(win[15] / Sn, 1);
+    x[15] = Math.min(win[17] / Sn, 0.6);
+    x[16] = Math.min(win[18] / Sn, 0.4);
+    x[17] = Math.min(win[19] / Sn, 0.4);
+    x[18] = paraC / 2;
+    x[19] = Rn > 0 ? clamp(mean - 26, 0, 12) : 0;
+    x[20] = cfg.spec && win[21] >= 4 ? clamp(win[22] / win[21] - 0.5, -0.5, 0.5) : 0;
+    x[21] = ttrN ? ttrS / ttrN - 0.75 : MEAN[21];
+    x[22] = Rn > 0 ? Math.min(win[24] / Rn, 4) : MEAN[22];
+    x[23] = Rn > 0 ? clamp(mean / 20 - 1, -0.8, 1) : MEAN[23];
+    x[24] = lang === 'de' ? 1 : 0;
+    x[25] = lang === 'nl' ? 1 : 0;
     let z = BIAS;
-    for (let k = 0; k < NF; k++) z += c[k];
+    for (let k = 0; k < NF; k++){ c[k] = W[k] * (x[k] - MEAN[k]); z += c[k]; }
+    c[24] = c[25] = 0;
     // a short text gives less evidence: pull toward a cautious, slightly human-leaning prior
-    const conf = Math.min(1, W / 80), PRIOR = -0.2;
+    const conf = Math.min(1, Wd / 80), PRIOR = -1;
     bz[b] = PRIOR + (z - PRIOR) * conf;
     if ((b & 255) === 0) progress(78 + 14 * b / Math.max(1, B));
   }
@@ -793,13 +803,20 @@ function analyze(text, progress){
     const l = reasons[i]; if (!l || p[i] < 0.7) continue;
     for (let q = 0; q < l.length; q += 2) if (l[q + 1] > 0) freqAi[l[q]]++;
   }
-  const featAi = new Array(NF).fill(0);
+  const featAi = {};
   const bp = new Float32Array(B);
   for (let b = 0; b < B; b++) bp[b] = prob(bz[b]);
-  for (let b = 0; b < B; b++){ if (bp[b] < 0.7) continue; for (let k = 0; k < NF; k++) if (bc[b * NF + k] >= 0.25) featAi[k]++; }
+  for (let b = 0; b < B; b++){
+    if (bp[b] < 0.7) continue;
+    for (let k = 0; k < NF; k++){
+      if (bc[b * NF + k] < 0.25) continue;
+      const lab = bx[b * NF + k] >= MEAN[k] ? FEAT[k][1] : FEAT[k][2];
+      if (lab) featAi[lab] = (featAi[lab] || 0) + 1;
+    }
+  }
   progress(100);
   return {
-    lang, starts, p, blockOf, bz, bp, bc, feat: FEAT, reasons, names: REASONS, freqAi, featAi, blocks: B,
+    lang, starts, p, blockOf, bz, bp, bc, bx, bW, rsum, mean: MEAN, feat: FEAT, reasons, names: REASONS, freqAi, featAi, blocks: B,
     hidden: { counts, first, decoded, hgWords },
     stats: { chars: n, words, sentences: sentN, scored, aiC, mixC, aiN, mixN, mean: scored ? pSum / scored : 0, emdash },
     ms: Date.now() - t0,
@@ -808,6 +825,8 @@ function analyze(text, progress){
 
 self.onmessage = e => {
   try {
+    // calibration runs can pass trial weights
+    if (e.data.model){ W = e.data.model.W; MEAN = e.data.model.MEAN; BIAS = e.data.model.BIAS; if (e.data.model.PSCALE) { PSCALE = e.data.model.PSCALE; PSHIFT = e.data.model.PSHIFT; } }
     let lastPost = 0;
     const r = analyze(e.data.text, pct => { const now = Date.now(); if (now - lastPost > 60 || pct >= 100){ lastPost = now; self.postMessage({ type: 'progress', pct }); } });
     self.postMessage({ type: 'done', r });
@@ -839,7 +858,7 @@ const I18N = {
     docTitle: 'Every sentence, marked.', mapAria: 'Overview of the whole text. Red marks are AI-style passages. Click to jump.',
     start: 'start', end: 'end', prev: '◂ Prev', prevAria: 'Previous page', next: 'Next ▸', nextAria: 'Next page', nextAi: 'Next AI-style passage',
     howTitle: 'How this works, and what it can\'t do',
-    howBody: '<p>The text is split into passages of about 100 words. Each passage is measured as a whole, the way detectors like ZeroGPT work, because clean AI writing rarely gives itself away in a single sentence. Each sentence then gets its passage\'s score, adjusted by anything specific to that sentence.</p><ul><li><b>Languages:</b> English, German and Dutch are recognised automatically, each with its own word lists and phrase patterns. Other languages get only the language-neutral checks.</li><li><b>Style statistics:</b> how evenly sentence lengths run, average word length, how many abstract nouns (-tion, -ment, -ity), trailing "-ing" clauses (", ensuring…"), and how polished the punctuation is.</li><li><b>Specifics:</b> human writing tends to carry names, places, numbers, a personal "I", asides in parentheses and exclamation marks. Generic text without them leans AI.</li><li><b>Wording:</b> words and stock phrases that language models overuse ("enhance", "crucial", "delve", "a testament to", "it\'s important to note").</li><li><b>Templates:</b> "not just X, but Y", "Whether you\'re a… or a…", essay-style wrap-ups, formal transitions at the start of sentences.</li><li><b>Formatting:</b> markdown bold and headings, bullets with bold lead-ins, emoji bullets, frequent em dashes.</li><li><b>Human signals lower the score:</b> slang, typos, lowercase "i", repeated punctuation, uneven rhythm.</li><li><b>Hidden characters:</b> zero-width characters, unusual spaces, direction controls, Unicode tag characters and variation-selector runs (which can carry a hidden message, decoded here), and look-alike letters from other alphabets.</li></ul><p><b>No detector is 100% accurate, this one included.</b> Formal human writing (legal, academic, corporate) can score high. AI text that someone edited or rewrote can score low. Claude and GPT don\'t put a detectable watermark in their text, so no tool can prove who wrote something. Hidden characters prove the text passed through some tool or editor, not that an AI wrote it. Use the score as a reason to look closer, never as proof against a person.</p><p>It doesn\'t name the model (Claude, GPT, Gemini). Their styles overlap too much to tell apart reliably.</p>',
+    howBody: '<p>The text is split into passages of about 100 words. Each passage gets 26 measurements of its style, and a statistical model turns them into a score. Each sentence then gets its passage\'s score, adjusted by anything specific to that sentence.</p><ul><li><b>Trained, not guessed:</b> the model was fitted with logistic regression on 443 texts: 342 human texts written before 2021 (Wikipedia articles and discussion pages, Hacker News comments, Stack Exchange answers and Mastodon posts, in English, German and Dutch) and 101 AI texts in many genres, from essays and emails to stories, reviews and forum answers.</li><li><b>Measured accuracy:</b> in 5-fold cross-validation, where every text was scored by a model that had never seen it, Textprint marked at least half of the text as AI-style for 81% of the AI texts (English 85%, German 70%, Dutch 80%) and for 3.5% of the human texts. The previous version caught 52% and wrongly flagged 4.1%.</li><li><b>Style:</b> how evenly sentence lengths run, word length, abstract nouns, how varied the vocabulary is, trailing "-ing" clauses (", ensuring…"), how polished the punctuation is, and how evenly sized the paragraphs are.</li><li><b>Specifics:</b> names, numbers, technical terms, asides in parentheses, quotes and questions lean human. Generic text without them leans AI.</li><li><b>Wording:</b> words and stock phrases that language models overuse ("enhance", "crucial", "delve", "a testament to", "it\'s important to note"), in all three languages.</li><li><b>Formatting:</b> markdown bold and headings, bullets with bold lead-ins, emoji bullets.</li><li><b>Hidden characters:</b> zero-width characters, unusual spaces, direction controls, Unicode tag characters and variation-selector runs (which can carry a hidden message, decoded here), and look-alike letters from other alphabets.</li></ul><p><b>What the numbers don\'t tell you.</b> The AI test texts come from one model family (Claude). Text from other AI models, AI text that a person edited, and kinds of writing that weren\'t in the test can score differently, so expect lower accuracy in real use. No detector is 100% accurate, this one included. Claude and GPT don\'t put a detectable watermark in their text, so no tool can prove who wrote something. Hidden characters prove the text passed through some tool or editor, not that an AI wrote it. Use the score as a reason to look closer, never as proof against a person.</p><p>It doesn\'t name the model (Claude, GPT, Gemini). Their styles overlap too much to tell apart reliably.</p>',
     reading: 'Reading', runFirst: 'Run an analysis to see the score.', honest: 'These are AI-style signals, not proof. See "How this works" below the document.',
     whyTitle: 'Why this sentence', clickHint: 'Click any sentence in the document to see what raised or lowered its score.',
     topTitle: 'Most frequent signals', nothingYet: 'Nothing yet.', marksTitle: 'Hidden marks', copyClean: 'Copy cleaned text', useClean: 'Clean and re-check',
@@ -868,7 +887,7 @@ const I18N = {
     docTitle: 'Jeder Satz, markiert.', mapAria: 'Übersicht über den ganzen Text. Rote Markierungen sind KI-typische Abschnitte. Klicken zum Springen.',
     start: 'Anfang', end: 'Ende', prev: '◂ Zurück', prevAria: 'Vorherige Seite', next: 'Weiter ▸', nextAria: 'Nächste Seite', nextAi: 'Nächster KI-typischer Abschnitt',
     howTitle: 'So funktioniert’s, und was es nicht kann',
-    howBody: '<p>Der Text wird in Abschnitte von etwa 100 Wörtern geteilt. Jeder Abschnitt wird als Ganzes gemessen, so wie es Detektoren wie ZeroGPT tun, denn saubere KI-Texte verraten sich selten in einem einzigen Satz. Jeder Satz erhält dann die Bewertung seines Abschnitts, ergänzt um Merkmale dieses Satzes.</p><ul><li><b>Sprachen:</b> Englisch, Deutsch und Niederländisch werden automatisch erkannt, jeweils mit eigenen Wortlisten und Formulierungsmustern. Andere Sprachen erhalten nur die sprachunabhängigen Prüfungen.</li><li><b>Stilstatistik:</b> wie gleichmäßig die Satzlängen sind, durchschnittliche Wortlänge, Anteil abstrakter Substantive (-ung, -heit, -keit), angehängte Nebensätze („, wodurch…“) und wie glatt die Zeichensetzung ist.</li><li><b>Konkretes:</b> Menschen schreiben eher mit Namen, Orten, Zahlen, einem persönlichen „ich“, Klammerbemerkungen und Ausrufezeichen. Allgemeiner Text ohne all das wirkt eher wie KI.</li><li><b>Wortwahl:</b> Wörter und Floskeln, die Sprachmodelle häufig verwenden („entscheidend“, „ganzheitlich“, „nahtlos“, „spielt eine entscheidende Rolle“, „es ist wichtig zu beachten“).</li><li><b>Schablonen:</b> „nicht nur X, sondern auch Y“, „Ob Anfänger oder Profi“, Aufsatz-Schlüsse wie „Zusammenfassend“, förmliche Überleitungen am Satzanfang.</li><li><b>Formatierung:</b> Markdown-Fettdruck und Überschriften, Aufzählungen mit fettem Anfang, Emoji als Aufzählungszeichen, häufige Gedankenstriche.</li><li><b>Menschliche Signale senken die Bewertung:</b> Umgangssprache, Tippfehler, mehrfache Satzzeichen, unruhiger Rhythmus.</li><li><b>Versteckte Zeichen:</b> Null-Breite-Zeichen, ungewöhnliche Leerzeichen, Richtungssteuerzeichen, Unicode-Tag-Zeichen und Variationsselektoren (die eine versteckte Nachricht tragen können, hier entschlüsselt) sowie ähnlich aussehende Buchstaben aus anderen Alphabeten.</li></ul><p><b>Kein Detektor ist zu 100 % genau, auch dieser nicht.</b> Förmliche menschliche Texte (juristisch, wissenschaftlich, geschäftlich) können hoch bewertet werden. Überarbeitete KI-Texte können niedrig bewertet werden. Claude und GPT setzen kein erkennbares Wasserzeichen in ihre Texte, daher kann kein Werkzeug beweisen, wer etwas geschrieben hat. Versteckte Zeichen zeigen nur, dass ein Text durch ein Werkzeug oder einen Editor gegangen ist, nicht dass eine KI ihn geschrieben hat. Nutze die Bewertung als Anlass, genauer hinzusehen, nie als Beweis gegen eine Person.</p><p>Das Modell (Claude, GPT, Gemini) wird nicht genannt. Ihre Stile überschneiden sich zu stark, um sie zuverlässig zu unterscheiden.</p>',
+    howBody: '<p>Der Text wird in Abschnitte von etwa 100 Wörtern geteilt. Für jeden Abschnitt werden 26 Stilmerkmale gemessen, und ein statistisches Modell macht daraus eine Bewertung. Jeder Satz erhält dann die Bewertung seines Abschnitts, ergänzt um Merkmale dieses Satzes.</p><ul><li><b>Trainiert statt geschätzt:</b> Das Modell wurde per logistischer Regression an 443 Texten angepasst: 342 menschliche Texte von vor 2021 (Wikipedia-Artikel und -Diskussionsseiten, Kommentare auf Hacker News, Antworten auf Stack Exchange und Mastodon-Beiträge, auf Englisch, Deutsch und Niederländisch) und 101 KI-Texte aus vielen Textsorten, von Aufsätzen und E-Mails bis zu Geschichten, Rezensionen und Forenantworten.</li><li><b>Gemessene Genauigkeit:</b> In einer 5-fachen Kreuzvalidierung, bei der jeder Text von einem Modell bewertet wurde, das ihn nie gesehen hatte, markierte Textprint bei 81 % der KI-Texte mindestens die Hälfte als KI-typisch (Englisch 85 %, Deutsch 70 %, Niederländisch 80 %), aber nur bei 3,5 % der menschlichen Texte. Die vorherige Version erkannte 52 % und markierte 4,1 % fälschlich.</li><li><b>Stil:</b> wie gleichmäßig die Satzlängen sind, Wortlänge, abstrakte Substantive, wie abwechslungsreich der Wortschatz ist, angehängte Nebensätze („, wodurch…“), wie glatt die Zeichensetzung ist und wie gleich lang die Absätze sind.</li><li><b>Konkretes:</b> Namen, Zahlen, Fachbegriffe, Klammerbemerkungen, Zitate und Fragen sprechen eher für Menschen. Allgemeiner Text ohne all das wirkt eher wie KI.</li><li><b>Wortwahl:</b> Wörter und Floskeln, die Sprachmodelle häufig verwenden („entscheidend“, „ganzheitlich“, „nahtlos“, „spielt eine entscheidende Rolle“, „es ist wichtig zu beachten“), in allen drei Sprachen.</li><li><b>Formatierung:</b> Markdown-Fettdruck und Überschriften, Aufzählungen mit fettem Anfang, Emoji als Aufzählungszeichen.</li><li><b>Versteckte Zeichen:</b> Null-Breite-Zeichen, ungewöhnliche Leerzeichen, Richtungssteuerzeichen, Unicode-Tag-Zeichen und Variationsselektoren (die eine versteckte Nachricht tragen können, hier entschlüsselt) sowie ähnlich aussehende Buchstaben aus anderen Alphabeten.</li></ul><p><b>Was die Zahlen nicht sagen.</b> Die KI-Testtexte stammen von einer Modellfamilie (Claude). Texte anderer KI-Modelle, von Menschen überarbeitete KI-Texte und Textsorten, die nicht im Test waren, können anders bewertet werden. Im echten Einsatz ist also mit geringerer Genauigkeit zu rechnen. Kein Detektor ist zu 100 % genau, auch dieser nicht. Claude und GPT setzen kein erkennbares Wasserzeichen in ihre Texte, daher kann kein Werkzeug beweisen, wer etwas geschrieben hat. Versteckte Zeichen zeigen nur, dass ein Text durch ein Werkzeug oder einen Editor gegangen ist, nicht dass eine KI ihn geschrieben hat. Nutze die Bewertung als Anlass, genauer hinzusehen, nie als Beweis gegen eine Person.</p><p>Das Modell (Claude, GPT, Gemini) wird nicht genannt. Ihre Stile überschneiden sich zu stark, um sie zuverlässig zu unterscheiden.</p>',
     reading: 'Ergebnis', runFirst: 'Starte eine Prüfung, um die Bewertung zu sehen.', honest: 'Das sind KI-typische Signale, kein Beweis. Siehe „So funktioniert’s“ unter dem Dokument.',
     whyTitle: 'Warum dieser Satz', clickHint: 'Klicke auf einen Satz im Dokument, um zu sehen, was seine Bewertung erhöht oder gesenkt hat.',
     topTitle: 'Häufigste Signale', nothingYet: 'Noch nichts.', marksTitle: 'Versteckte Zeichen', copyClean: 'Bereinigten Text kopieren', useClean: 'Bereinigen und neu prüfen',
@@ -897,7 +916,7 @@ const I18N = {
     docTitle: 'Elke zin, gemarkeerd.', mapAria: 'Overzicht van de hele tekst. Rode markeringen zijn passages in AI-stijl. Klik om ernaartoe te gaan.',
     start: 'begin', end: 'einde', prev: '◂ Vorige', prevAria: 'Vorige pagina', next: 'Volgende ▸', nextAria: 'Volgende pagina', nextAi: 'Volgende passage in AI-stijl',
     howTitle: 'Zo werkt het, en wat het niet kan',
-    howBody: '<p>De tekst wordt opgedeeld in passages van ongeveer 100 woorden. Elke passage wordt als geheel gemeten, zoals detectoren als ZeroGPT dat doen, want nette AI-tekst verraadt zich zelden in één zin. Elke zin krijgt daarna de score van zijn passage, aangevuld met wat specifiek in die zin staat.</p><ul><li><b>Talen:</b> Engels, Duits en Nederlands worden automatisch herkend, elk met eigen woordenlijsten en zinspatronen. Andere talen krijgen alleen de taalonafhankelijke controles.</li><li><b>Stijlstatistiek:</b> hoe gelijkmatig zinslengtes zijn, gemiddelde woordlengte, aantal abstracte zelfstandige naamwoorden (-ing, -heid, -tie), aangehangen bijzinnen (", waardoor…") en hoe verzorgd de interpunctie is.</li><li><b>Details:</b> mensen schrijven vaker met namen, plaatsen, getallen, een persoonlijke "ik", opmerkingen tussen haakjes en uitroeptekens. Algemene tekst zonder dat neigt naar AI.</li><li><b>Woordkeus:</b> woorden en clichés die taalmodellen vaak gebruiken ("cruciaal", "naadloos", "veelzijdig", "speelt een cruciale rol", "het is belangrijk om op te merken").</li><li><b>Sjablonen:</b> "niet alleen X, maar ook Y", "Of je nu een beginner bent of…", opstel-afsluiters als "Kortom", formele overgangen aan het begin van zinnen.</li><li><b>Opmaak:</b> vetgedrukte markdown en kopjes, opsommingen met een vet begin, emoji als opsommingsteken, veel gedachtestreepjes.</li><li><b>Menselijke signalen verlagen de score:</b> spreektaal, typefouten, herhaalde leestekens, onregelmatig ritme.</li><li><b>Verborgen tekens:</b> tekens zonder breedte, ongewone spaties, richtingstekens, Unicode-tagtekens en variatieselectoren (die een verborgen bericht kunnen bevatten, hier ontcijferd) en letters uit andere alfabetten die erop lijken.</li></ul><p><b>Geen enkele detector is 100% nauwkeurig, deze ook niet.</b> Formele menselijke tekst (juridisch, academisch, zakelijk) kan hoog scoren. AI-tekst die iemand heeft bewerkt kan laag scoren. Claude en GPT plaatsen geen herkenbaar watermerk in hun tekst, dus geen enkel hulpmiddel kan bewijzen wie iets schreef. Verborgen tekens bewijzen alleen dat de tekst door een programma of editor is gegaan, niet dat een AI hem schreef. Gebruik de score als reden om beter te kijken, nooit als bewijs tegen iemand.</p><p>Het model (Claude, GPT, Gemini) wordt niet genoemd. Hun stijlen lijken te veel op elkaar om ze betrouwbaar te onderscheiden.</p>',
+    howBody: '<p>De tekst wordt opgedeeld in passages van ongeveer 100 woorden. Voor elke passage worden 26 stijlkenmerken gemeten, en een statistisch model maakt daar een score van. Elke zin krijgt daarna de score van zijn passage, aangevuld met wat specifiek in die zin staat.</p><ul><li><b>Getraind, niet gegokt:</b> het model is met logistische regressie afgestemd op 443 teksten: 342 menselijke teksten van vóór 2021 (Wikipedia-artikelen en -overlegpagina\'s, reacties op Hacker News, antwoorden op Stack Exchange en Mastodon-berichten, in het Engels, Duits en Nederlands) en 101 AI-teksten in allerlei genres, van opstellen en e-mails tot verhalen, recensies en forumantwoorden.</li><li><b>Gemeten nauwkeurigheid:</b> bij 5-voudige kruisvalidatie, waarbij elke tekst werd beoordeeld door een model dat hem nooit had gezien, markeerde Textprint bij 81% van de AI-teksten minstens de helft als AI-stijl (Engels 85%, Duits 70%, Nederlands 80%), en bij 3,5% van de menselijke teksten. De vorige versie herkende 52% en markeerde 4,1% ten onrechte.</li><li><b>Stijl:</b> hoe gelijkmatig zinslengtes zijn, woordlengte, abstracte zelfstandige naamwoorden, hoe gevarieerd de woordenschat is, aangehangen bijzinnen (", waardoor…"), hoe verzorgd de interpunctie is en hoe gelijk de alinea\'s zijn.</li><li><b>Details:</b> namen, getallen, vaktermen, opmerkingen tussen haakjes, citaten en vragen wijzen eerder op een mens. Algemene tekst zonder dat neigt naar AI.</li><li><b>Woordkeus:</b> woorden en clichés die taalmodellen vaak gebruiken ("cruciaal", "naadloos", "veelzijdig", "speelt een cruciale rol", "het is belangrijk om op te merken"), in alle drie de talen.</li><li><b>Opmaak:</b> vetgedrukte markdown en kopjes, opsommingen met een vet begin, emoji als opsommingsteken.</li><li><b>Verborgen tekens:</b> tekens zonder breedte, ongewone spaties, richtingstekens, Unicode-tagtekens en variatieselectoren (die een verborgen bericht kunnen bevatten, hier ontcijferd) en letters uit andere alfabetten die erop lijken.</li></ul><p><b>Wat de cijfers niet zeggen.</b> De AI-testteksten komen van één modelfamilie (Claude). Teksten van andere AI-modellen, AI-tekst die iemand heeft bewerkt en soorten teksten die niet in de test zaten, kunnen anders scoren. Reken in de praktijk dus op een lagere nauwkeurigheid. Geen enkele detector is 100% nauwkeurig, deze ook niet. Claude en GPT plaatsen geen herkenbaar watermerk in hun tekst, dus geen enkel hulpmiddel kan bewijzen wie iets schreef. Verborgen tekens bewijzen alleen dat de tekst door een programma of editor is gegaan, niet dat een AI hem schreef. Gebruik de score als reden om beter te kijken, nooit als bewijs tegen iemand.</p><p>Het model (Claude, GPT, Gemini) wordt niet genoemd. Hun stijlen lijken te veel op elkaar om ze betrouwbaar te onderscheiden.</p>',
     reading: 'Uitslag', runFirst: 'Start een controle om de score te zien.', honest: 'Dit zijn signalen van AI-stijl, geen bewijs. Zie "Zo werkt het" onder het document.',
     whyTitle: 'Waarom deze zin', clickHint: 'Klik op een zin in het document om te zien wat de score verhoogde of verlaagde.',
     topTitle: 'Meest voorkomende signalen', nothingYet: 'Nog niets.', marksTitle: 'Verborgen tekens', copyClean: 'Opgeschoonde tekst kopiëren', useClean: 'Opschonen en opnieuw controleren',
@@ -942,16 +961,17 @@ const SIG = {
     'Emoji used as bullet or heading': 'Emoji als Aufzählungszeichen oder Überschrift', 'Casual slang (human-like)': 'Umgangssprache (menschlich)', 'Repeated punctuation (human-like)': 'Mehrfache Satzzeichen (menschlich)',
     'Lowercase "i" (human-like)': 'Kleines „i“ (menschlich)', 'Typo or missing apostrophe (human-like)': 'Tippfehler (menschlich)', 'Contains hidden characters': 'Enthält versteckte Zeichen',
     'Contains unusual space characters (e.g. U+202F)': 'Enthält ungewöhnliche Leerzeichen (z. B. U+202F)', 'Contains a word with look-alike letters': 'Enthält ein Wort mit ähnlich aussehenden Buchstaben',
-    'AI-favored vocabulary': 'Von KI bevorzugte Wörter', 'Little AI-favored vocabulary': 'Kaum KI-typische Wörter', 'Trailing "-ing" clauses (", ensuring…", ", making…")': 'Angehängte Nebensätze („, wodurch…“)',
-    'Even sentence lengths (low burstiness)': 'Gleichmäßige Satzlängen', 'Varied sentence lengths (human-like)': 'Wechselnde Satzlängen (menschlich)', 'Long words on average': 'Im Schnitt lange Wörter',
-    'Short, plain words': 'Kurze, einfache Wörter', 'Many abstract nouns (-tion, -ment, -ity)': 'Viele abstrakte Substantive (-ung, -heit, -keit)', 'Few abstract nouns': 'Wenige abstrakte Substantive',
-    'Personal voice (I, me, my)': 'Persönliche Stimme (ich, mir, mein)', 'Exclamation marks': 'Ausrufezeichen', 'Specific numbers, dates and technical terms': 'Konkrete Zahlen, Daten und Fachbegriffe',
-    'Generic, few names or places': 'Allgemein, kaum Namen oder Orte', 'Names, places and proper nouns': 'Namen, Orte und Eigennamen', 'Parenthetical asides': 'Klammerbemerkungen',
+    'Lots of AI-favored vocabulary': 'Viele von KI bevorzugte Wörter', 'Little AI-favored vocabulary': 'Kaum KI-typische Wörter', 'Trailing "-ing" clauses (", ensuring…", ", making…")': 'Angehängte Nebensätze („, wodurch…“)',
+    'Even sentence lengths (low burstiness)': 'Gleichmäßige Satzlängen', 'Varied sentence lengths': 'Wechselnde Satzlängen', 'Long words on average': 'Im Schnitt lange Wörter', 'Short, plain words': 'Kurze, einfache Wörter',
+    'Many abstract nouns (-tion, -ment, -ity)': 'Viele abstrakte Substantive (-ung, -heit, -keit)', 'Few abstract nouns': 'Wenige abstrakte Substantive', 'Personal voice (I, me, my)': 'Persönliche Stimme (ich, mir, mein)',
+    'Exclamation marks': 'Ausrufezeichen', 'Specific numbers, dates and technical terms': 'Konkrete Zahlen, Daten und Fachbegriffe', 'Few numbers or technical terms': 'Kaum Zahlen oder Fachbegriffe',
+    'Names, places and proper nouns': 'Namen, Orte und Eigennamen', 'Generic, few names or places': 'Allgemein, kaum Namen oder Orte', 'Parenthetical asides': 'Klammerbemerkungen',
     'Sentences opening with "This/These…"': 'Sätze beginnen mit „Dies/Diese…“', 'Em dashes': 'Gedankenstriche', 'AI stock phrases and formatting': 'KI-Floskeln und Formatierung',
-    'Slang, typos or casual punctuation': 'Umgangssprache, Tippfehler oder lockere Zeichensetzung', 'Polished punctuation and capitalization': 'Glatte Zeichensetzung und Großschreibung',
-    'Loose punctuation or capitalization': 'Lockere Zeichensetzung oder Großschreibung', 'Quotes or dialogue': 'Zitate oder Dialog', 'Questions': 'Fragen', 'Very short sentences (human-like)': 'Sehr kurze Sätze (menschlich)',
-    'Evenly sized paragraphs': 'Gleich lange Absätze', 'Uneven paragraph sizes': 'Unterschiedlich lange Absätze', 'Long, dense sentences (human-like)': 'Lange, dichte Sätze (menschlich)',
-    'Generic vocabulary, few specialist terms': 'Allgemeiner Wortschatz, kaum Fachbegriffe', 'Specialist or technical vocabulary': 'Fach- oder Spezialwortschatz',
+    'Slang, typos or casual punctuation': 'Umgangssprache, Tippfehler oder lockere Zeichensetzung', 'Loose punctuation or capitalization': 'Lockere Zeichensetzung oder Großschreibung', 'Polished punctuation and capitalization': 'Glatte Zeichensetzung und Großschreibung',
+    'Quotes or dialogue': 'Zitate oder Dialog', 'Questions': 'Fragen', 'Very short sentences': 'Sehr kurze Sätze', 'Evenly sized paragraphs': 'Gleich lange Absätze', 'Uneven paragraph sizes': 'Unterschiedlich lange Absätze',
+    'Long, dense sentences': 'Lange, dichte Sätze', 'Specialist or technical vocabulary': 'Fach- oder Spezialwortschatz', 'Generic vocabulary, few specialist terms': 'Allgemeiner Wortschatz, kaum Fachbegriffe',
+    'Varied vocabulary, few repeated words': 'Abwechslungsreicher Wortschatz, kaum Wiederholungen', 'Repeats the same words': 'Wiederholt dieselben Wörter', 'Many commas per sentence': 'Viele Kommas pro Satz', 'Few commas per sentence': 'Wenige Kommas pro Satz',
+    'Longer sentences on average': 'Im Schnitt längere Sätze', 'Short sentences on average': 'Im Schnitt kurze Sätze',
   },
   nl: {
     'Chatbot self-reference ("as an AI…")': 'Chatbot verwijst naar zichzelf ("als AI…")', 'Chatbot interface artifact': 'Restant van een chatbot-interface',
@@ -976,16 +996,17 @@ const SIG = {
     'Emoji used as bullet or heading': 'Emoji als opsommingsteken of kopje', 'Casual slang (human-like)': 'Spreektaal (menselijk)', 'Repeated punctuation (human-like)': 'Herhaalde leestekens (menselijk)',
     'Lowercase "i" (human-like)': 'Kleine letter "i" (menselijk)', 'Typo or missing apostrophe (human-like)': 'Typefout (menselijk)', 'Contains hidden characters': 'Bevat verborgen tekens',
     'Contains unusual space characters (e.g. U+202F)': 'Bevat ongewone spaties (bijv. U+202F)', 'Contains a word with look-alike letters': 'Bevat een woord met lookalike-letters',
-    'AI-favored vocabulary': 'Woorden die AI graag gebruikt', 'Little AI-favored vocabulary': 'Weinig typische AI-woorden', 'Trailing "-ing" clauses (", ensuring…", ", making…")': 'Aangehangen bijzinnen (", waardoor…")',
-    'Even sentence lengths (low burstiness)': 'Gelijkmatige zinslengtes', 'Varied sentence lengths (human-like)': 'Wisselende zinslengtes (menselijk)', 'Long words on average': 'Gemiddeld lange woorden',
-    'Short, plain words': 'Korte, eenvoudige woorden', 'Many abstract nouns (-tion, -ment, -ity)': 'Veel abstracte zelfstandige naamwoorden (-ing, -heid, -tie)', 'Few abstract nouns': 'Weinig abstracte zelfstandige naamwoorden',
-    'Personal voice (I, me, my)': 'Persoonlijke stem (ik, mij, mijn)', 'Exclamation marks': 'Uitroeptekens', 'Specific numbers, dates and technical terms': 'Concrete getallen, data en vaktermen',
-    'Generic, few names or places': 'Algemeen, weinig namen of plaatsen', 'Names, places and proper nouns': 'Namen, plaatsen en eigennamen', 'Parenthetical asides': 'Opmerkingen tussen haakjes',
+    'Lots of AI-favored vocabulary': 'Veel woorden die AI graag gebruikt', 'Little AI-favored vocabulary': 'Weinig typische AI-woorden', 'Trailing "-ing" clauses (", ensuring…", ", making…")': 'Aangehangen bijzinnen (", waardoor…")',
+    'Even sentence lengths (low burstiness)': 'Gelijkmatige zinslengtes', 'Varied sentence lengths': 'Wisselende zinslengtes', 'Long words on average': 'Gemiddeld lange woorden', 'Short, plain words': 'Korte, eenvoudige woorden',
+    'Many abstract nouns (-tion, -ment, -ity)': 'Veel abstracte zelfstandige naamwoorden (-ing, -heid, -tie)', 'Few abstract nouns': 'Weinig abstracte zelfstandige naamwoorden', 'Personal voice (I, me, my)': 'Persoonlijke stem (ik, mij, mijn)',
+    'Exclamation marks': 'Uitroeptekens', 'Specific numbers, dates and technical terms': 'Concrete getallen, data en vaktermen', 'Few numbers or technical terms': 'Weinig getallen of vaktermen',
+    'Names, places and proper nouns': 'Namen, plaatsen en eigennamen', 'Generic, few names or places': 'Algemeen, weinig namen of plaatsen', 'Parenthetical asides': 'Opmerkingen tussen haakjes',
     'Sentences opening with "This/These…"': 'Zinnen die beginnen met "Dit/Deze…"', 'Em dashes': 'Gedachtestreepjes', 'AI stock phrases and formatting': 'AI-clichés en opmaak',
-    'Slang, typos or casual punctuation': 'Spreektaal, typefouten of losse interpunctie', 'Polished punctuation and capitalization': 'Verzorgde interpunctie en hoofdletters',
-    'Loose punctuation or capitalization': 'Losse interpunctie of hoofdletters', 'Quotes or dialogue': 'Citaten of dialoog', 'Questions': 'Vragen', 'Very short sentences (human-like)': 'Zeer korte zinnen (menselijk)',
-    'Evenly sized paragraphs': 'Even lange alinea\'s', 'Uneven paragraph sizes': 'Ongelijke alinealengtes', 'Long, dense sentences (human-like)': 'Lange, dichte zinnen (menselijk)',
-    'Generic vocabulary, few specialist terms': 'Algemene woordenschat, weinig vaktermen', 'Specialist or technical vocabulary': 'Vak- of technische woordenschat',
+    'Slang, typos or casual punctuation': 'Spreektaal, typefouten of losse interpunctie', 'Loose punctuation or capitalization': 'Losse interpunctie of hoofdletters', 'Polished punctuation and capitalization': 'Verzorgde interpunctie en hoofdletters',
+    'Quotes or dialogue': 'Citaten of dialoog', 'Questions': 'Vragen', 'Very short sentences': 'Zeer korte zinnen', 'Evenly sized paragraphs': 'Even lange alinea\'s', 'Uneven paragraph sizes': 'Ongelijke alinealengtes',
+    'Long, dense sentences': 'Lange, dichte zinnen', 'Specialist or technical vocabulary': 'Vak- of technische woordenschat', 'Generic vocabulary, few specialist terms': 'Algemene woordenschat, weinig vaktermen',
+    'Varied vocabulary, few repeated words': 'Gevarieerde woordenschat, weinig herhaling', 'Repeats the same words': 'Herhaalt dezelfde woorden', 'Many commas per sentence': 'Veel komma\'s per zin', 'Few commas per sentence': 'Weinig komma\'s per zin',
+    'Longer sentences on average': 'Gemiddeld langere zinnen', 'Short sentences on average': 'Gemiddeld korte zinnen',
   },
 };
 const CATS_I18N = {
@@ -1143,8 +1164,7 @@ function makeWorker(){
 function run(){
   let src = ta.value;
   if (!src.trim()){ setStatus(t('stEmpty'), true); return; }
-  if (src.length > MAX) src = src.slice(0, MAX);
-  if (wk) wk.terminate();
+  if (src.length > MAX) src = src.slice(0, MAX);  if (wk) wk.terminate();
   try { wk = makeWorker(); } catch (e) { setStatus(t('stBlocked', { e: e.message }), true); return; }
   const id = ++runId, me = wk;
   setBusy(true); setStatus(''); progStart();
@@ -1189,8 +1209,7 @@ function renderSummary(){
     '</svg><div class="ringnum"><div class="big">' + Math.round(share * 100) + '<span>%</span></div><div class="ringlab">' + esc(t('ringLab')) + '</div></div></div>' +
     '<p class="verdict">' + esc(verdict(share)) + '</p>' +
     '<dl class="kv">' +
-      '<dt>' + esc(t('kvLang')) + '</dt><dd>' + esc(t('lang_' + (R.lang || 'en'))) + '</dd>' +
-      '<dt>' + esc(t('kvAi')) + '</dt><dd>' + fmt(st.aiN) + '</dd>' +
+      '<dt>' + esc(t('kvLang')) + '</dt><dd>' + esc(t('lang_' + (R.lang || 'en'))) + '</dd>' +      '<dt>' + esc(t('kvAi')) + '</dt><dd>' + fmt(st.aiN) + '</dd>' +
       '<dt>' + esc(t('kvMix')) + '</dt><dd>' + fmt(st.mixN) + '</dd>' +
       '<dt>' + esc(t('kvAll')) + '</dt><dd>' + fmt(st.sentences) + '</dd>' +
       '<dt>' + esc(t('kvAvg')) + '</dt><dd>' + Math.round(st.mean * 100) + '%</dd>' +
@@ -1202,7 +1221,7 @@ function renderSummary(){
 }
 function renderTop(){
   const items = [];
-  R.featAi.forEach((c, k) => { if (c > 0) items.push([c, R.feat[k][1], 'passages']); });
+  Object.entries(R.featAi).forEach(([lab, c]) => items.push([c, lab, 'passages']));
   R.freqAi.forEach((c, id) => { if (c > 0) items.push([c, R.names[id], 'sentences']); });
   items.sort((a, b) => b[0] - a[0]);
   $('top').innerHTML = items.length
@@ -1268,7 +1287,7 @@ function renderDetail(i){
   const feats = [];
   for (let k = 0; k < NF; k++){
     const c = R.bc[b * NF + k];
-    const label = c > 0 ? R.feat[k][1] : R.feat[k][2];
+    const label = R.bx[b * NF + k] >= R.mean[k] ? R.feat[k][1] : R.feat[k][2];
     if (Math.abs(c) >= 0.15 && label) feats.push([c, label]);
   }
   feats.sort((x, y) => Math.abs(y[0]) - Math.abs(x[0]));
@@ -1328,8 +1347,7 @@ ta.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 
 $('run').addEventListener('click', run);
 $('clear').addEventListener('click', () => { ta.value = ''; updCount(); ta.focus(); });
 $('sample').addEventListener('click', () => { ta.value = buildSample(lang); updCount(); run(); });
-document.querySelectorAll('.langsw button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
-$('file').addEventListener('change', async e => {
+document.querySelectorAll('.langsw button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));$('file').addEventListener('change', async e => {
   const f = e.target.files && e.target.files[0]; if (!f) return;
   try {
     let s = await f.text();
@@ -1372,6 +1390,5 @@ ta.value = buildSample(lang); updCount();
 run();
 })();
 </script>
-
 </body>
 </html>
